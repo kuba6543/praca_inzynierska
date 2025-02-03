@@ -22,7 +22,31 @@
 
 module testbench();
 
-    parameter CLK = 10;
+    parameter CLK               = 10;
+
+    parameter M_COUNT           = 4;
+    parameter S_COUNT           = 4;
+    parameter DATA_WIDTH        = 32;
+    parameter ADDR_WIDTH        = 32;
+    parameter STRB_WIDTH        = (DATA_WIDTH/8);
+    parameter ID_WIDTH          = 8;
+    parameter AWUSER_ENABLE     = 0;
+    parameter AWUSER_WIDTH      = 1;
+    parameter WUSER_ENABLE      = 0;
+    parameter WUSER_WIDTH       = 1;
+    parameter BUSER_ENABLE      = 0;
+    parameter BUSER_WIDTH       = 1;
+    parameter ARUSER_ENABLE     = 0;
+    parameter ARUSER_WIDTH      = 1;
+    parameter RUSER_ENABLE      = 0;
+    parameter RUSER_WIDTH       = 1;
+    parameter FORWARD_ID        = 0;
+    parameter M_REGIONS         = 1;
+    parameter M_BASE_ADDR       = 0;
+    parameter M_ADDR_WIDTH      = {M_COUNT{{M_REGIONS{32'd24}}}};
+    parameter M_CONNECT_READ    = {M_COUNT{{S_COUNT{1'b1}}}};
+    parameter M_CONNECT_WRITE   = {M_COUNT{{S_COUNT{1'b1}}}};
+    parameter M_SECURE          = {M_COUNT{1'b0}};
     
     /*
         AXI clock and reset
@@ -37,60 +61,60 @@ module testbench();
 
     // AXI Slave Address Write
 
-    wire s_axi_awid;
-    wire s_axi_awaddr;
-    wire s_axi_awlen;
-    wire s_axi_awsize;
-    wire s_axi_awburst;
-    wire s_axi_awlock;
-    wire s_axi_awcache;
-    wire s_axi_awprot;
-    wire s_axi_awqos;
-    wire s_axi_awuser;
-    wire s_axi_awvalid;
-    wire s_axi_awready;
+    wire [S_COUNT*ID_WIDTH-1:0]     s_axi_awid;
+    wire [S_COUNT*ADDR_WIDTH-1:0]   s_axi_awaddr;
+    wire [S_COUNT*8-1:0]            s_axi_awlen;
+    wire [S_COUNT*3-1:0]            s_axi_awsize;
+    wire [S_COUNT*2-1:0]            s_axi_awburst;
+    wire [S_COUNT-1:0]              s_axi_awlock;
+    wire [S_COUNT*4-1:0]            s_axi_awcache;
+    wire [S_COUNT*3-1:0]            s_axi_awprot;
+    wire [S_COUNT*4-1:0]            s_axi_awqos;
+    wire [S_COUNT*AWUSER_WIDTH-1:0] s_axi_awuser;
+    wire [S_COUNT-1:0]              s_axi_awvalid;
+    wire [S_COUNT-1:0]              s_axi_awready;
 
    // AXI Slave Write
 
-    wire s_axi_wdata;
-    wire s_axi_wstrb;
-    wire s_axi_wlast;
-    wire s_axi_wuser;
-    wire s_axi_wvalid;
-    wire s_axi_wready;
+    wire [S_COUNT*DATA_WIDTH-1:0]   s_axi_wdata;
+    wire [S_COUNT*STRB_WIDTH-1:0]   s_axi_wstrb;
+    wire [S_COUNT-1:0]              s_axi_wlast;
+    wire [S_COUNT*WUSER_WIDTH-1:0]  s_axi_wuser;
+    wire [S_COUNT-1:0]              s_axi_wvalid;
+    wire [S_COUNT-1:0]              s_axi_wready;
 
    // AXI Slave Write Response
 
-    wire s_axi_bid;
-    wire s_axi_bresp;
-    wire s_axi_buser;
-    wire s_axi_bvalid;
-    wire s_axi_bready;
+    wire [S_COUNT*ID_WIDTH-1:0]     s_axi_bid;
+    wire [S_COUNT*2-1:0]            s_axi_bresp;
+    wire [S_COUNT*BUSER_WIDTH-1:0]  s_axi_buser;
+    wire [S_COUNT-1:0]              s_axi_bvalid;
+    wire [S_COUNT-1:0]              s_axi_bready;
 
    // AXI Slave Address Read
 
-    wire s_axi_arid;
-    wire s_axi_araddr;
-    wire s_axi_arlen;
-    wire s_axi_arsize;
-    wire s_axi_arburst;
-    wire s_axi_arlock;
-    wire s_axi_arcache;
-    wire s_axi_arprot;
-    wire s_axi_arqos;
-    wire s_axi_aruser;
-    wire s_axi_arvalid;
-    wire s_axi_arready;
+    wire [S_COUNT*ID_WIDTH-1:0]     s_axi_arid;
+    wire [S_COUNT*ADDR_WIDTH-1:0]   s_axi_araddr;
+    wire [S_COUNT*8-1:0]            s_axi_arlen;
+    wire [S_COUNT*3-1:0]            s_axi_arsize;
+    wire [S_COUNT*2-1:0]            s_axi_arburst;
+    wire [S_COUNT-1:0]              s_axi_arlock;
+    wire [S_COUNT*4-1:0]            s_axi_arcache;
+    wire [S_COUNT*3-1:0]            s_axi_arprot;
+    wire [S_COUNT*4-1:0]            s_axi_arqos;
+    wire [S_COUNT*ARUSER_WIDTH-1:0] s_axi_aruser;
+    wire [S_COUNT-1:0]              s_axi_arvalid;
+    wire [S_COUNT-1:0]              s_axi_arready;
 
     // AXI Slave Read
 
-    wire s_axi_rid;
-    wire s_axi_rdata;
-    wire s_axi_rresp;
-    wire s_axi_rlast;
-    wire s_axi_ruser;
-    wire s_axi_rvalid;
-    wire s_axi_rready;
+    wire [S_COUNT*ID_WIDTH-1:0]     s_axi_rid;
+    wire [S_COUNT*DATA_WIDTH-1:0]   s_axi_rdata;
+    wire [S_COUNT*2-1:0]            s_axi_rresp;
+    wire [S_COUNT-1:0]              s_axi_rlast;
+    wire [S_COUNT*RUSER_WIDTH-1:0]  s_axi_ruser;
+    wire [S_COUNT-1:0]              s_axi_rvalid;
+    wire [S_COUNT-1:0]              s_axi_rready;
 
 
     /*
@@ -99,64 +123,92 @@ module testbench();
 
     // AXI Master Address Write
 
-    wire m_axi_awid;
-    wire m_axi_awaddr;
-    wire m_axi_awlen;
-    wire m_axi_awsize;
-    wire m_axi_awburst;
-    wire m_axi_awlock;
-    wire m_axi_awcache;
-    wire m_axi_awprot;
-    wire m_axi_awqos;
-    wire m_axi_awregion;
-    wire m_axi_awuser;
-    wire m_axi_awvalid;
-    wire m_axi_awready;
+    wire [M_COUNT*ID_WIDTH-1:0]     m_axi_awid;
+    wire [M_COUNT*ADDR_WIDTH-1:0]   m_axi_awaddr;
+    wire [M_COUNT*8-1:0]            m_axi_awlen;
+    wire [M_COUNT*3-1:0]            m_axi_awsize;
+    wire [M_COUNT*2-1:0]            m_axi_awburst;
+    wire [M_COUNT-1:0]              m_axi_awlock;
+    wire [M_COUNT*4-1:0]            m_axi_awcache;
+    wire [M_COUNT*3-1:0]            m_axi_awprot;
+    wire [M_COUNT*4-1:0]            m_axi_awqos;
+    wire [M_COUNT*4-1:0]            m_axi_awregion;
+    wire [M_COUNT*AWUSER_WIDTH-1:0] m_axi_awuser;
+    wire [M_COUNT-1:0]              m_axi_awvalid;
+    wire [M_COUNT-1:0]              m_axi_awready;
 
     // AXI Master Write
 
-    wire m_axi_wdata;
-    wire m_axi_wstrb;
-    wire m_axi_wlast;
-    wire m_axi_wuser;
-    wire m_axi_wvalid;
-    wire m_axi_wready;
+    wire [M_COUNT*DATA_WIDTH-1:0]   m_axi_wdata;
+    wire [M_COUNT*STRB_WIDTH-1:0]   m_axi_wstrb;
+    wire [M_COUNT-1:0]              m_axi_wlast;
+    wire [M_COUNT*WUSER_WIDTH-1:0]  m_axi_wuser;
+    wire [M_COUNT-1:0]              m_axi_wvalid;
+    wire [M_COUNT-1:0]              m_axi_wready;
 
     // AXI Master Write Response
 
-    wire m_axi_bid;
-    wire m_axi_bresp;
-    wire m_axi_buser;
-    wire m_axi_bvalid;
-    wire m_axi_bready;
+    wire [M_COUNT*ID_WIDTH-1:0]     m_axi_bid;
+    wire [M_COUNT*2-1:0]            m_axi_bresp;
+    wire [M_COUNT*BUSER_WIDTH-1:0]  m_axi_buser;
+    wire [M_COUNT-1:0]              m_axi_bvalid;
+    wire [M_COUNT-1:0]              m_axi_bready;
 
     // AXI Master Address Read
 
-    wire m_axi_arid;
-    wire m_axi_araddr;
-    wire m_axi_arlen;
-    wire m_axi_arsize;
-    wire m_axi_arburst;
-    wire m_axi_arlock;
-    wire m_axi_arcache;
-    wire m_axi_arprot;
-    wire m_axi_arqos;
-    wire m_axi_arregion;
-    wire m_axi_aruser;
-    wire m_axi_arvalid;
-    wire m_axi_arready;
+    wire [M_COUNT*ID_WIDTH-1:0]     m_axi_arid;
+    wire [M_COUNT*ADDR_WIDTH-1:0]   m_axi_araddr;
+    wire [M_COUNT*8-1:0]            m_axi_arlen;
+    wire [M_COUNT*3-1:0]            m_axi_arsize;
+    wire [M_COUNT*2-1:0]            m_axi_arburst;
+    wire [M_COUNT-1:0]              m_axi_arlock;
+    wire [M_COUNT*4-1:0]            m_axi_arcache;
+    wire [M_COUNT*3-1:0]            m_axi_arprot;
+    wire [M_COUNT*4-1:0]            m_axi_arqos;
+    wire [M_COUNT*4-1:0]            m_axi_arregion;
+    wire [M_COUNT*ARUSER_WIDTH-1:0] m_axi_aruser;
+    wire [M_COUNT-1:0]              m_axi_arvalid;
+    wire [M_COUNT-1:0]              m_axi_arready;
 
     // AXI Master Read
 
-    wire m_axi_rid;
-    wire m_axi_rdata;
-    wire m_axi_rresp;
-    wire m_axi_rlast;
-    wire m_axi_ruser;
-    wire m_axi_rvalid;
-    wire m_axi_rready;
+    wire [M_COUNT*ID_WIDTH-1:0]     m_axi_rid;
+    wire [M_COUNT*DATA_WIDTH-1:0]   m_axi_rdata;
+    wire [M_COUNT*2-1:0]            m_axi_rresp;
+    wire [M_COUNT-1:0]              m_axi_rlast;
+    wire [M_COUNT*RUSER_WIDTH-1:0]  m_axi_ruser;
+    wire [M_COUNT-1:0]              m_axi_rvalid;
+    wire [M_COUNT-1:0]              m_axi_rready;
+
+class axi_agent extends uvm_agent;
+
+endclass
 
 axi_interconnect #(
+
+    .S_COUNT(S_COUNT),
+    .M_COUNT(M_COUNT),
+    .DATA_WIDTH(DATA_WIDTH),
+    .ADDR_WIDTH(ADDR_WIDTH),
+    .STRB_WIDTH(STRB_WIDTH),
+    .ID_WIDTH(ID_WIDTH),
+    .AWUSER_ENABLE(AWUSER_ENABLE),
+    .AWUSER_WIDTH(AWUSER_WIDTH),
+    .WUSER_ENABLE(WUSER_ENABLE),
+    .WUSER_WIDTH(WUSER_WIDTH),
+    .BUSER_ENABLE(BUSER_ENABLE),
+    .BUSER_WIDTH(BUSER_WIDTH),
+    .ARUSER_ENABLE(ARUSER_ENABLE),
+    .ARUSER_WIDTH(ARUSER_WIDTH),
+    .RUSER_ENABLE(RUSER_ENABLE),
+    .RUSER_WIDTH(RUSER_WIDTH),
+    .FORWARD_ID(FORWARD_ID),
+    .M_REGIONS(M_REGIONS),
+    .M_BASE_ADDR(M_BASE_ADDR),
+    .M_ADDR_WIDTH(M_ADDR_WIDTH),
+    .M_CONNECT_READ(M_CONNECT_READ),
+    .M_CONNECT_WRITE(M_CONNECT_WRITE),
+    .M_SECURE(M_SECURE)
 
 ) 
 axi_interconnect_inst (
