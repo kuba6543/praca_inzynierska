@@ -22,6 +22,9 @@
 
 module testbench();
 
+    //`include "uvm/src/uvm.sv"
+    `include "uvm_classes/axi_agent.sv"
+
     parameter CLK               = 10;
 
     parameter M_COUNT           = 4;
@@ -180,10 +183,6 @@ module testbench();
     wire [M_COUNT-1:0]              m_axi_rvalid;
     wire [M_COUNT-1:0]              m_axi_rready;
 
-class axi_agent extends uvm_agent;
-
-endclass
-
 axi_interconnect #(
 
     .S_COUNT(S_COUNT),
@@ -303,12 +302,14 @@ axi_interconnect_inst (
     .m_axi_rready(m_axi_rready)
 );
 
-always #(CLK/2) clk = ~clk;   // generate clock
+always #(CLK/2) clk = ~clk;   //generate clock
 
 initial begin
     clk = 0;
     rst = 1;
     #100 rst = 0;
+    
+    axi_agent.new();
 end
 
 endmodule
