@@ -1,4 +1,14 @@
 `timescale 1ns / 1ps
+// import UVM components
+`include "uvm_macros.svh"
+import uvm_pkg::*;
+
+// import simulation parameters
+`include "parameters.svh"
+
+// import self-made UVM classes
+`include "uvm_classes/uvm_classes.svh"
+
 //////////////////////////////////////////////////////////////////////////////////
 // Company: 
 // Engineer: Jakub Bartuszek
@@ -21,43 +31,13 @@
 
 
 module testbench();
-
-    //`include "uvm/src/uvm.sv"
-    `include "uvm_classes/axi_agent.sv"
-
-    parameter CLK               = 10;
-
-    parameter M_COUNT           = 4;
-    parameter S_COUNT           = 4;
-    parameter DATA_WIDTH        = 32;
-    parameter ADDR_WIDTH        = 32;
-    parameter STRB_WIDTH        = (DATA_WIDTH/8);
-    parameter ID_WIDTH          = 8;
-    parameter AWUSER_ENABLE     = 0;
-    parameter AWUSER_WIDTH      = 1;
-    parameter WUSER_ENABLE      = 0;
-    parameter WUSER_WIDTH       = 1;
-    parameter BUSER_ENABLE      = 0;
-    parameter BUSER_WIDTH       = 1;
-    parameter ARUSER_ENABLE     = 0;
-    parameter ARUSER_WIDTH      = 1;
-    parameter RUSER_ENABLE      = 0;
-    parameter RUSER_WIDTH       = 1;
-    parameter FORWARD_ID        = 0;
-    parameter M_REGIONS         = 1;
-    parameter M_BASE_ADDR       = 0;
-    parameter M_ADDR_WIDTH      = {M_COUNT{{M_REGIONS{32'd24}}}};
-    parameter M_CONNECT_READ    = {M_COUNT{{S_COUNT{1'b1}}}};
-    parameter M_CONNECT_WRITE   = {M_COUNT{{S_COUNT{1'b1}}}};
-    parameter M_SECURE          = {M_COUNT{1'b0}};
-    
     /*
         AXI clock and reset
     */
-
+    
     reg clk;
     reg rst = 1;
-
+    
     /*
         AXI Slave connections 
     */
@@ -307,9 +287,14 @@ always #(CLK/2) clk = ~clk;   //generate clock
 initial begin
     clk = 0;
     rst = 1;
-    #100 rst = 0;
-    
-    axi_agent.new();
+    #10 rst = 0;
 end
+
+axi_if vif(clk, rst);
+
+//initial begin
+//    uvm_config_db#(virtual axi_if)::set(uvm_root::get(), "uvm_test_top", "axi_if", vif);
+//    run_test("base_test");
+//end
 
 endmodule
