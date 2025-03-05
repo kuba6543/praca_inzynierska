@@ -1,14 +1,14 @@
-class axi_enviroment extends uvm_env;
+class axi_env extends uvm_env;
 
     `include "../parameters.svh"
 
     axi_agent_master axi_agent_master;
     axi_agent_slave axi_agent_slave;
   
-    `uvm_component_utils(axi_enviroment)
+    `uvm_component_utils(axi_env)
     
     // new - constructor
-    function new(string name, uvm_component parent);
+    function new (string name, uvm_component parent);
         super.new(name, parent);
     endfunction : new
 
@@ -23,4 +23,4 @@ class axi_enviroment extends uvm_env;
         end
     endfunction : build_phase
 
-endclass : axi_enviroment
+endclass : axi_env

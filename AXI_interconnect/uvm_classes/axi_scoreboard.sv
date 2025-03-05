@@ -14,7 +14,7 @@ class axi_scoreboard extends uvm_scoreboard;
     endfunction: build_phase
   
     // write
-    virtual function void write(axi_seq pkt);
+    virtual function void write(axi_sequence pkt);
         $display("AXI Scoreboard: Packet recived");
         pkt.print();
     endfunction : write

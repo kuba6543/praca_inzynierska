@@ -1,4 +1,4 @@
-class axi_sequencer extends uvm_sequencer #(axi_transaction);
+class axi_sequencer extends uvm_sequencer#(axi_transaction);
     // UVM automation macros for general components
     `uvm_component_utils(axi_sequencer)
 

@@ -5,7 +5,7 @@ class axi_agent_master extends uvm_agent;
     axi_monitor           monitor;
 
   // UVM automation macros for general components
-    `uvm_component_utils(axi_agent)
+    `uvm_component_utils(axi_agent_master)
 
   // constructor of AXI agent
     function new (string name, uvm_component parent);

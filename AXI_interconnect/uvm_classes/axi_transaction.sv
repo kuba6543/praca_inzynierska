@@ -1,9 +1,7 @@
-`include "../parameters.svh"
-
 class axi_transaction extends uvm_sequence_item;
     
     /*
-     * AXI slave inputinterfaces
+     * AXI slave input interfaces
      */    
     
     rand bit [S_COUNT*ID_WIDTH-1:0]     s_axi_awid;
@@ -109,7 +107,7 @@ class axi_transaction extends uvm_sequence_item;
     bit [M_COUNT-1:0]              m_axi_rready;
 
 
-    `uvm_object_utils_begin(mem_seq_item)
+    `uvm_object_utils_begin(axi_transaction)
         `uvm_field_int(s_axi_awid, UVM_ALL_ON)
         `uvm_field_int(s_axi_awaddr, UVM_ALL_ON)
         `uvm_field_int(s_axi_awlen, UVM_ALL_ON)
@@ -159,36 +157,26 @@ class axi_transaction extends uvm_sequence_item;
     endfunction : new
 
     constraint AxBURST_RESERVED {
-        for(int i = 0; i < M_COUNT; i = i + 1) begin
-            m_axi_awburst[(2*i)+1:(2*i)] != 2'b11;
-            m_axi_arburst[(2*i)+1:(2*i)] != 2'b11;
-        end
-
-        for(int i = 0; i < S_COUNT; i = i + 1) begin
-            s_axi_awburst[(2*i)+1:(2*i)] != 2'b11;
-            s_axi_arburst[(2*i)+1:(2*i)] != 2'b11;
-        end
+            m_axi_awburst != 2'b11;
+            m_axi_arburst != 2'b11;
+            s_axi_awburst != 2'b11;
+            s_axi_arburst != 2'b11;
     };
 
     constraint AxLOCK_RESERVED {
-        for(int i = 0; i < M_COUNT; i = i + 1) begin
-            m_axi_awlock[(2*i)+1:(2*i)] != 2'b11;
-            m_axi_arlock[(2*i)+1:(2*i)] != 2'b11;
-        end
-
-        for(int i = 0; i < S_COUNT; i = i + 1) begin
-            s_axi_awlock[(2*i)+1:(2*i)] != 2'b11;
-            s_axi_arlock[(2*i)+1:(2*i)] != 2'b11;
-        end
+            m_axi_awlock != 2'b11;
+            m_axi_arlock != 2'b11;
+            s_axi_awlock != 2'b11;
+            s_axi_arlock != 2'b11;
     };
     constraint BRESP_RESERVED {
-        for(int i = 0; i < M_COUNT; i = i + 1) m_axi_bresp[(3*i)+2:(3*i)] != 3'b110;
-        for(int i = 0; i < S_COUNT; i = i + 1) s_axi_bresp[(3*i)+2:(3*i)] != 3'b110;
+            m_axi_bresp != 3'b110;
+            s_axi_bresp != 3'b110;
     };
 
     constraint RRESP_RESERVED {
-        for(int i = 0; i < M_COUNT; i = i + 1) m_axi_rresp[(3*i)+2:(3*i)] != 3'b111;
-        for(int i = 0; i < S_COUNT; i = i + 1) s_axi_rresp[(3*i)+2:(3*i)] != 3'b111;
+            m_axi_rresp != 3'b111;
+            s_axi_rresp != 3'b111;
     };
 
 endclass : axi_transaction

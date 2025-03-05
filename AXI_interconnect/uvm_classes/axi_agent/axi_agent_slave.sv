@@ -1,11 +1,11 @@
-class axi_agent_master extends uvm_agent;
+class axi_agent_slave extends uvm_agent;
   //declaring agent components
     axi_driver_slave      driver;
     axi_sequencer         sequencer;
     axi_monitor           monitor;
 
   // UVM automation macros for general components
-    `uvm_component_utils(axi_agent)
+    `uvm_component_utils(axi_agent_slave)
 
   // constructor of AXI agent
     function new (string name, uvm_component parent);
@@ -29,4 +29,4 @@ class axi_agent_master extends uvm_agent;
     end
     endfunction : connect_phase
 
-endclass : axi_agent_master
+endclass : axi_agent_slave
