@@ -35,8 +35,8 @@ module testbench();
         AXI clock and reset
     */
     
-    reg clk;
-    reg rst = 1;
+   reg clk;
+   reg rst = 1;
     
     /*
         AXI Slave connections 
@@ -282,19 +282,19 @@ axi_interconnect_inst (
     .m_axi_rready(m_axi_rready)
 );
 
-always #(CLK/2) clk = ~clk;   //generate clock
+    always #(CLK/2) clk = ~clk;   //generate clock
 
-initial begin
-    clk = 0;
-    rst = 1;
-    #10 rst = 0;
-end
+    initial begin
+        clk = 0;
+        rst = 1;
+        #10 rst = 0;
+    end
 
-axi_if vif(clk, rst);
+    axi_if vif(clk, rst);
 
-//initial begin
-//    uvm_config_db#(virtual axi_if)::set(uvm_root::get(), "uvm_test_top", "axi_if", vif);
-//    run_test("base_test");
-//end
+    initial begin
+        uvm_config_db#(virtual axi_if)::set(uvm_root::get(), "uvm_test_top", "axi_if", vif);
+        run_test("axi_test");
+    end
 
 endmodule

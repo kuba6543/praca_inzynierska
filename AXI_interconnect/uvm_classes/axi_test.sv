@@ -12,10 +12,10 @@ class axi_test extends uvm_test;
   	virtual function void build_phase(uvm_phase phase);
     	super.build_phase(phase);
     	env = axi_env::type_id::create("env", this);
-		seq = axi_sequence::type_id::create("seq");
   	endfunction : build_phase
 
   	task run_phase(uvm_phase phase);
+		seq = axi_sequence::type_id::create("seq");
     	seq.start(env.axi_agent_slave.sequencer);
     	seq.start(env.axi_agent_master.sequencer);
 	endtask : run_phase

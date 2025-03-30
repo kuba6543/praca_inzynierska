@@ -14,15 +14,29 @@ class axi_sequence extends uvm_sequence#(axi_transaction);
         txn = axi_transaction::type_id::create("txn");
         if (!rxn.randomize() || !txn.randomize()) `uvm_error("SEQ", "Randomization failed!")
 
-        `uvm_info("SEQ", $sformatf("Generated READ Transaction:\n%s", txn.sprint()), UVM_MEDIUM)
-        send_request(rxn);
-        wait_for_item_done();
-        get_response(rrsp);
+        fork
+            read(rxn);
+            write(txn);
+        join
 
-        `uvm_info("SEQ", $sformatf("Generated READ Transaction:\n%s", txn.sprint()), UVM_MEDIUM)
-        send_request(txn);
-        wait_for_item_done();
-        get_response(brsp);  
     endtask
+
+    task read(axi_transaction rxn);
+        begin
+            `uvm_info("SEQ", $sformatf("Generated READ Transaction:\n%s", rxn.sprint()), UVM_MEDIUM)
+            send_request(rxn);
+            wait_for_item_done();
+            get_response(vif.m_axi_rresp); 
+        end
+    endtask : read
+
+    task write(axi_transaction txn);
+        begin
+            `uvm_info("SEQ", $sformatf("Generated WRITE Transaction:\n%s", txn.sprint()), UVM_MEDIUM)
+            send_request(txn);
+            wait_for_item_done();
+            get_response(vif.m_axi_bresp);  
+        end
+    endtask : write
 
 endclass : axi_sequence

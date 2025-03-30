@@ -9,3 +9,4 @@
 `include "axi_scoreboard.sv"
 `include "axi_env.sv"
 `include "axi_test.sv"
+`include "../axi_if.sv"

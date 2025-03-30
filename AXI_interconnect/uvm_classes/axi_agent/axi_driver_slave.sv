@@ -31,47 +31,47 @@ class axi_driver_slave extends uvm_driver #(axi_transaction);
     
     virtual task reset();
         // addr write
-       vif.AWREADY   <= 0;
+       vif.s_axi_awready   <= 0;
         // data write
-       vif.WREADY    <= 0;
+       vif.s_axi_wready    <= 0;
         // resp write
-       vif.BID       <= 0;
-	   vif.BRESP     <= 0;
-	   vif.BUSER     <= 0;
-	   vif.BVALID    <= 0;
+       vif.s_axi_bid       <= 0;
+	   vif.s_axi_bresp     <= 0;
+	   vif.s_axi_buser     <= 0;
+	   vif.s_axi_bvalid    <= 0;
         // addr read
-	   vif.ARREADY   <= 0;
+	   vif.s_axi_arready   <= 0;
         // data read
-       vif.RID       <= 0;
-	   vif.RDATA     <= 0;
-	   vif.RRESP     <= 0;        
-	   vif.RLAST     <= 0;
-	   vif.RUSER     <= 0;
-	   vif.RVALID    <= 0;
+       vif.s_axi_rid       <= 0;
+	   vif.s_axi_rdata     <= 0;
+	   vif.s_axi_rresp     <= 0;        
+	   vif.s_axi_rlast     <= 0;
+	   vif.s_axi_ruser     <= 0;
+	   vif.s_axi_rvalid    <= 0;
     endtask : reset
 
     task write_addr();
         begin
-            vif.AWREADY <= 1'b0;
+            vif.s_axi_awready <= 1'b0;
             @(posedge vif.clk);
-            vif.AWREADY <= 1'b1;
+            vif.s_axi_awready <= 1'b1;
             @(posedge vif.clk);
             // wait for AWVALID to be received
-            while(!vif.AWVALID) @(posedge vif.clk);
+            while(!vif.s_axi_awvalid) @(posedge vif.clk);
         end
     endtask : write_addr
     
     task write_data();
         forever begin
-            vif.WREADY <= 1'b0;
+            vif.s_axi_wready <= 1'b0;
             repeat(2) @(posedge vif.clk);
-            vif.WREADY <= 1'b1;
+            vif.s_axi_wready <= 1'b1;
             @(posedge vif.clk);
             // wait for AWVALID to be received
-            while(!vif.WVALID) @(posedge vif.clk);
+            while(!vif.s_axi_wvalid) @(posedge vif.clk);
             // continuous hold cycle for burst case
             @(posedge vif.clk);
-            vif.WREADY <= 1'b1;
+            vif.s_axi_wready <= 1'b1;
             repeat(2) @(posedge vif.clk);
         end
     endtask : write_data
@@ -81,30 +81,32 @@ class axi_driver_slave extends uvm_driver #(axi_transaction);
         forever begin
             repeat(m_wr_queue.size()==0) @(posedge vif.clk);
             // sent tr
-            vif.BVALID <= 1'b1;
-            vif.BID    <= tr.id;
-            vif.BRESP  <= OKAY;
+            vif.s_axi_bvalid <= 1'b1;
+            vif.s_axi_bid    <= tr.id;
+            vif.s_axi_bresp  <= 3'b000;
             @(posedge vif.clk);
             // wait for BREADY to be received
-            while(!vif.BREADY) @(posedge vif.clk);
-            vif.BVALID <= 1'b0;
+            while(!vif.s_axi_bready) @(posedge vif.clk);
+            vif.s_axi_bvalid <= 1'b0;
             @(posedge vif.clk);
         end
     endtask : sent_resp_write
 
     task read_addr();
         forever begin
-            vif.ARREADY <= 1'b0;
+            vif.s_axi_arready <= 1'b0;
             repeat(2) @(posedge vif.clk);
-            vif.ARREADY <= 1'b1;
+            vif.s_axi_arready <= 1'b1;
             @(posedge vif.clk);
             // wait ARVALID received
-            while(!vif.ARVALID) @(posedge vif.clk);
+            while(!vif.s_axi_arvalid) @(posedge vif.clk);
         end
     endtask : read_addr
 
     task read_data();
         int unsigned i = 0;
+        int m_rd_queue[];
+        int tr;
         forever begin
             repeat(m_rd_queue.size()==0) @(posedge vif.clk);
             if (m_rd_queue.size()!=0) begin
@@ -112,17 +114,17 @@ class axi_driver_slave extends uvm_driver #(axi_transaction);
                 i = 0;
                 repeat(m_conf.data_rd_delay) @(posedge vif.clk);
                 // sent tr
-                while (i!=tr.len+1) begin
-                    vif.RVALID  <= 1'b1;
-                    vif.RDATA   <= m_mem[tr.mem_addrs[i]];
-                    vif.RID     <= tr.id;
-                    vif.RRESP   <= OKAY;
-                    vif.RLAST   <= (i==tr.len)? 1'b1 : 1'b0;
+                while (i!=tr.length+1) begin
+                    vif.s_axi_rvalid  <= 1'b1;
+                    vif.s_axi_rdata   <= m_mem[tr.mem_addrs[i]];
+                    vif.s_axi_rid     <= tr.id;
+                    vif.s_axi_rresp   <= 3'b000;
+                    vif.s_axi_rlast   <= (i==tr.length)? 1'b1 : 1'b0;
                     @(posedge vif.clk);
-                    if (vif.RREADY && vif.RVALID) i = i+1;
+                    if (vif.s_axi_rready && vif.s_axi_rvalid) i = i+1;
                 end
-                vif.RVALID <= 1'b0;
-                vif.RLAST  <= 1'b0;
+                vif.s_axi_rvalid <= 1'b0;
+                vif.s_axi_rlast  <= 1'b0;
                 @(posedge vif.clk);
             end
         end

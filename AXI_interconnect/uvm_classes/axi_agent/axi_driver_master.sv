@@ -2,8 +2,8 @@ class axi_driver_master extends uvm_driver #(axi_transaction);
 
     `include "../../parameters.svh"
 
-    virtual interface axi_if    vif;
-    vif.cb_drv hook;
+    virtual interface axi_if vif;
+    virtual interface axi_if hook;
     logic [DATA_WIDTH-1:0]  rd_data;
     axi_transaction             m_wr_queue[$];
     axi_transaction             m_rd_queue[$];
@@ -29,15 +29,19 @@ class axi_driver_master extends uvm_driver #(axi_transaction);
         super.run_phase(phase);
         reset();
         forever begin
-            seq_item_port.get_next_item(seq);
-            case(seq.op_cmd)
-         	    RESET:fork
-    		        reset();
-    	        join
-    	        WRITE:fork 
+            //seq_item_port.get_next_item(seq);
+            //case(seq.op_cmd)
+            seq_item_port.get_next_item(vif);
+            case(axi_sequence)
+//         	    RESET:fork
+//    		        reset();
+//    	        join
+//    	        WRITE:fork 
+                write(): fork
     		        write_addr();write_data();received_resp_write();
     	        join
-    	        READ: fork
+//    	        READ: fork
+                read(): fork
     		        read_addr();read_data(rd_data);
     	        join
     	        default:`uvm_fatal("axi_driver","No valid command")
@@ -48,38 +52,39 @@ class axi_driver_master extends uvm_driver #(axi_transaction);
 
     task reset();
         begin
-            hook.AWID   <= 0;
-            hook.AWADDR <= 0;
-    	    hook.AWLEN  <= 0;
+            hook.m_axi_awid   <= 0;
+            hook.m_axi_awaddr <= 0;
+    	    hook.m_axi_awlen  <= 0;
         end
     endtask:reset
 
     task write_addr();
         axi_transaction m_tr;
+        axi_transaction m_trx;
         forever begin
             // if write tr has existed...
             repeat(m_wr_queue.size()==0) @(posedge vif.clk);
 
             if (m_wr_addr_indx < m_wr_queue.size()) begin
-                m_tr = m_wr_queue[m_wr_addr_indx];
+                m_trx = m_wr_queue[m_wr_addr_indx];
                 repeat(m_trx.addr_wt_delay) @(posedge vif.clk);
     
                 // sent tr
-                hook.AWVALID <= 1'b1;
-                hook.AWID    <= m_tr.id;
-                hook.AWADDR  <= m_tr.addr;
-                hook.AWREG   <= m_tr.region;
-                hook.AWLEN   <= m_tr.len;
-                hook.AWSIZE  <= m_tr.size;
-                hook.AWBURST <= m_tr.burst;
-                hook.AWLOCK  <= m_tr.lock;
-                hook.AWCACHE <= m_tr.cache;
-                hook.AWPROT  <= m_tr.prot;
-                hook.AWQOS   <= m_tr.qos;
+                hook.m_axi_awvalid <= 1'b1;
+                hook.m_axi_awid    <= m_tr.m_axi_awid;
+                hook.m_axi_awaddr  <= m_tr.m_axi_awaddr;
+                hook.m_axi_awreg   <= m_tr.m_axi_awreg;
+                hook.m_axi_awlen   <= m_tr.m_axi_awlen;
+                hook.m_axi_awsize  <= m_tr.m_axi_awsize;
+                hook.m_axi_awburst <= m_tr.m_axi_awburst;
+                hook.m_axi_awlock  <= m_tr.m_axi_awlock;
+                hook.m_axi_awcache <= m_tr.m_axi_awcache;
+                hook.m_axi_awprot  <= m_tr.m_axi_awprot;
+                hook.m_axi_awqos   <= m_tr.m_axi_awqos;
 
                 //wait AWREADY
-                while (!hook.AWREADY) @(posedge vif.clk);
-                hook.AWVALID <= 1'b0;
+                while (!hook.m_axi_awready) @(posedge vif.clk);
+                hook.m_axi_awvalid <= 1'b0;
                 m_wr_addr_indx += 1;
             end 
             else begin
@@ -90,29 +95,30 @@ class axi_driver_master extends uvm_driver #(axi_transaction);
 
     task write_data();
         int unsigned  i = 0;
-        axi_transaction  m_tr;
+        axi_transaction m_tr;
+        axi_transaction m_trx;
         forever begin
             repeat(m_wr_queue.size()==0) @(posedge vif.clk);
             if (m_wr_data_indx < m_wr_queue.size()) begin
-                m_tr = m_wr_queue[m_wr_data_indx];
-                repeat(m_tr.data_wt_delay) @(posedge vif.clk);
+                m_trx = m_wr_queue[m_wr_data_indx];
+                repeat(m_trx.data_wt_delay) @(posedge vif.clk);
 
                 // sent trx
-                while (i<=m_tr.len) begin
-                    hook.WVALID  <= 1'b1;
-                    hook.WDATA   <= m_tr.data[i];
-                    hook.WSTRB   <= m_tr.strb[i];
-                    hook.WID     <= m_tr.id;
-                    hook.WLAST   <= (i==m_tr.len)? 1'b1 : 1'b0;
+                while (i<=m_tr.length) begin
+                    hook.m_axi_wvalid  <= 1'b1;
+                    hook.m_axi_wdata   <= m_tr.data[i];
+                    hook.m_axi_wstrb   <= m_tr.strb[i];
+                    hook.m_axi_wid     <= m_tr.id;
+                    hook.m_axi_wlast   <= (i==m_tr.length)? 1'b1 : 1'b0;
                     @(posedge vif.clk);
 
-                    if (vif.WREADY && vif.WVALID)
+                    if (vif.m_axi_wready && vif.m_axi_wvalid)
                         i = i+1;
                 end
     
                 // free tr
-                hook.WVALID <= 1'b0;
-                hook.WLAST  <= 1'b0;
+                hook.m_axi_wvalid <= 1'b0;
+                hook.m_axi_wlast  <= 1'b0;
                 i = 0;
                 @(posedge vif.clk);
                 m_wr_data_indx += 1;
@@ -125,41 +131,42 @@ class axi_driver_master extends uvm_driver #(axi_transaction);
 
     task received_resp_write();
         forever begin
-            hook.BREADY <= 1'b0;
+            hook.m_axi_bready <= 1'b0;
             repeat(2) @(posedge vif.clk);
 
-            hook.BREADY <= 1'b1;
+            hook.m_axi_bready <= 1'b1;
             @(posedge vif.clk);
 
             //wait BVALID received
-            while(!vif.BVALID) @(posedge vif.clk);
+            while(!vif.m_axi_bvalid) @(posedge vif.clk);
         end
     endtask : received_resp_write
 
     task read_addr();
         axi_transaction m_tr;
+        axi_transaction m_trx;
         forever begin
             repeat(m_rd_queue.size()==0) @(posedge vif.clk);
             if (m_rd_addr_indx < m_rd_queue.size()) begin
                 m_trx = m_rd_queue[m_rd_addr_indx];
-                repeat(m_tr.addr_rd_delay) @(posedge vif.clk);
+                repeat(m_trx.addr_rd_delay) @(posedge vif.clk);
 
                 // sent tr
-                hook.ARVALID <= 1'b1;
-                hook.ARID    <= m_tr.id;
-                hook.ARADDR  <= m_tr.addr;
-                hook.ARREADY <= m_tr.region;
-                hook.ARLEN   <= m_tr.len;
-                hook.ARSIZE  <= m_tr.size;
-                hook.ARBURST <= m_tr.burst;
-                hook.ARLOCK  <= m_tr.lock;
-                hook.ARCACHE <= m_tr.cache;
-                hook.ARPROT  <= m_tr.prot;
-                hook.ARQOS   <= m_tr.qos;
+                hook.m_axi_arvalid <= 1'b1;
+                hook.m_axi_arid    <= m_tr.m_axi_arid;
+                hook.m_axi_araddr  <= m_tr.m_axi_araddr;
+                hook.m_axi_arready <= m_tr.m_axi_arready;
+                hook.m_axi_arlen   <= m_tr.m_axi_arlen;
+                hook.m_axi_arsize  <= m_tr.m_axi_arsize;
+                hook.m_axi_arburst <= m_tr.m_axi_arburst;
+                hook.m_axi_arlock  <= m_tr.m_axi_arlock;
+                hook.m_axi_arcache <= m_tr.m_axi_arcache;
+                hook.m_axi_arprot  <= m_tr.m_axi_arprot;
+                hook.m_axi_arqos   <= m_tr.m_axi_arqos;
 
                 //wait ARREADY received
-                while(!hook.ARREADY) @(posedge vif.clk);
-                hook.ARVALID <= 1'b0;
+                while(!hook.m_axi_arready) @(posedge vif.clk);
+                hook.m_axi_arvalid <= 1'b0;
                 @(posedge vif.clk);
     	        m_rd_addr_indx += 1;
             end 
@@ -170,17 +177,17 @@ class axi_driver_master extends uvm_driver #(axi_transaction);
     endtask : read_addr
 
     task read_data(output logic /*[DATA_WIDTH-1:0] */ rd_data);
-        @(posedge vif.clk) rd_data = (vif.RVALID && vif.RREADY)? vif.RDATA : 0;
+        @(posedge vif.clk) rd_data = (vif.m_axi_rvalid && vif.m_axi_rready)? vif.m_axi_rdata : 0;
         forever begin
-            vif.RREADY <= 1'b0;
+            vif.m_axi_rready <= 1'b0;
             repeat(2) @(posedge vif.clk);
-            hook.RREADY <= 1'b1;
+            hook.m_axi_rready <= 1'b1;
 
             //wait RVALID received
-            while(!hook.RVALID) @(posedge vif.clk);   
+            while(!hook.m_axi_rvalid) @(posedge vif.clk);   
             // continuous burst case
-            while(!hook.RLAST) @(posedge vif.clk);
-            hook.RREADY <= 1'b0;
+            while(!hook.m_axi_rlast) @(posedge vif.clk);
+            hook.m_axi_rready <= 1'b0;
         end
     endtask : read_data
 
