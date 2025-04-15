@@ -289,102 +289,104 @@ axi_interconnect_inst (
         rst = 1;
         #10 rst = 0;
     end
+    
+    axi_if vif(clk, rst);
 
-    axi_if m_vif [M_COUNT]{
-        for (i=0; i<M_COUNT; i=i+1){
-            axi_awid[i] = m_axi_awid[i];
-            axi_awaddr[i] = m_axi_awaddr[i];
-            axi_awlen[i] = m_axi_awlen[i];
-            axi_awsize[i] = m_axi_awsize[i];
-            axi_awburst[i] = m_axi_awburst[i];
-            axi_awlock[i] = m_axi_awlock[i];
-            axi_awcache[i] = m_axi_awcache[i];
-            axi_awprot[i] = m_axi_awprot[i];
-            axi_awqos[i] = m_axi_awqos[i];
-            axi_awregion[i] = m_axi_awregion[i];
-            axi_awuser[i] = m_axi_awuser[i];
-            axi_awvalid[i] = m_axi_awvalid[i];
-            axi_awready[i] = m_axi_awready[i];
-            axi_wdata[i] = m_axi_wdata[i];
-            axi_wstrb[i] = m_axi_wstrb[i];
-            axi_wlast[i] = m_axi_wlast[i];
-            axi_wuser[i] = m_axi_wuser[i];
-            axi_wvalid[i] = m_axi_wvalid[i];
-            axi_wready[i] = m_axi_wready[i];
-            axi_bid[i] = m_axi_bid[i];
-            axi_bresp[i] = m_axi_bresp[i];
-            axi_buser[i] = m_axi_buser[i];
-            axi_bvalid[i] = m_axi_bvalid[i];
-            axi_bready[i] = m_axi_bready[i];
-            axi_arid[i] = m_axi_arid[i];
-            axi_araddr[i] = m_axi_araddr[i];
-            axi_arlen[i] = m_axi_arlen[i];
-            axi_arsize[i] = m_axi_arsize[i];
-            axi_arburst[i] = m_axi_arburst[i];
-            axi_arlock[i] = m_axi_arlock[i];
-            axi_arcache[i] = m_axi_arcache[i];
-            axi_arprot[i] = m_axi_arprot[i];
-            axi_arqos[i] = m_axi_arqos[i];
-            axi_arregion[i] = m_axi_arregion[i];
-            axi_aruser[i] = m_axi_aruser[i];
-            axi_arvalid[i] = m_axi_arvalid[i];
-            axi_arready[i] = m_axi_arready[i];
-            axi_rid[i] = m_axi_rid[i];
-            axi_rdata[i] = m_axi_rdata[i];
-            axi_rresp[i] = m_axi_rresp[i];
-            axi_rlast[i] = m_axi_rlast[i];
-            axi_ruser[i] = m_axi_ruser[i];
-            axi_rvalid[i] = m_axi_rvalid[i];
-            axi_rready[i] = m_axi_rready[i];
-        }
-    }
+    // axi_if m_vif [M_COUNT]{
+    //     for (i=0; i<M_COUNT; i=i+1){
+    //         axi_awid[i] <= m_axi_awid[i];
+    //         axi_awaddr[i] <= m_axi_awaddr[i];
+    //         axi_awlen[i] <= m_axi_awlen[i];
+    //         axi_awsize[i] <= m_axi_awsize[i];
+    //         axi_awburst[i] <= m_axi_awburst[i];
+    //         axi_awlock[i] <= m_axi_awlock[i];
+    //         axi_awcache[i] <= m_axi_awcache[i];
+    //         axi_awprot[i] <= m_axi_awprot[i];
+    //         axi_awqos[i] <= m_axi_awqos[i];
+    //         axi_awregion[i] <= m_axi_awregion[i];
+    //         axi_awuser[i] <= m_axi_awuser[i];
+    //         axi_awvalid[i] <= m_axi_awvalid[i];
+    //         axi_awready[i] <= m_axi_awready[i];
+    //         axi_wdata[i] <= m_axi_wdata[i];
+    //         axi_wstrb[i] <= m_axi_wstrb[i];
+    //         axi_wlast[i] <= m_axi_wlast[i];
+    //         axi_wuser[i] <= m_axi_wuser[i];
+    //         axi_wvalid[i] <= m_axi_wvalid[i];
+    //         axi_wready[i] <= m_axi_wready[i];
+    //         axi_bid[i] <= m_axi_bid[i];
+    //         axi_bresp[i] <= m_axi_bresp[i];
+    //         axi_buser[i] <= m_axi_buser[i];
+    //         axi_bvalid[i] <= m_axi_bvalid[i];
+    //         axi_bready[i] <= m_axi_bready[i];
+    //         axi_arid[i] <= m_axi_arid[i];
+    //         axi_araddr[i] <= m_axi_araddr[i];
+    //         axi_arlen[i] <= m_axi_arlen[i];
+    //         axi_arsize[i] <= m_axi_arsize[i];
+    //         axi_arburst[i] <= m_axi_arburst[i];
+    //         axi_arlock[i] <= m_axi_arlock[i];
+    //         axi_arcache[i] <= m_axi_arcache[i];
+    //         axi_arprot[i] <= m_axi_arprot[i];
+    //         axi_arqos[i] <= m_axi_arqos[i];
+    //         axi_arregion[i] <= m_axi_arregion[i];
+    //         axi_aruser[i] <= m_axi_aruser[i];
+    //         axi_arvalid[i] <= m_axi_arvalid[i];
+    //         axi_arready[i] <= m_axi_arready[i];
+    //         axi_rid[i] <= m_axi_rid[i];
+    //         axi_rdata[i] <= m_axi_rdata[i];
+    //         axi_rresp[i] <= m_axi_rresp[i];
+    //         axi_rlast[i] <= m_axi_rlast[i];
+    //         axi_ruser[i] <= m_axi_ruser[i];
+    //         axi_rvalid[i] <= m_axi_rvalid[i];
+    //         axi_rready[i] <= m_axi_rready[i];
+    //     }
+    // }
 
-    axi_if s_vif [S_COUNT]{
-        for (i=0; i<S_COUNT; i=i+1){
-            s_axi_awid[i] = axi_awid[i];
-            s_axi_awaddr[i] = axi_awaddr[i];
-            s_axi_awlen[i] = axi_awlen[i];
-            s_axi_awsize[i] = axi_awsize[i];
-            s_axi_awburst[i] = axi_awburst[i];
-            s_axi_awlock[i] = axi_awlock[i];
-            s_axi_awcache[i] = axi_awcache[i];
-            s_axi_awprot[i] = axi_awprot[i];
-            s_axi_awqos[i] = axi_awqos[i];
-            s_axi_awuser[i] = axi_awuser[i];
-            s_axi_awvalid[i] = axi_awvalid[i];
-            s_axi_awready[i] = axi_awready[i];
-            s_axi_wdata[i] = axi_wdata[i];
-            s_axi_wstrb[i] = axi_wstrb[i];
-            s_axi_wlast[i] = axi_wlast[i];
-            s_axi_wuser[i] = axi_wuser[i];
-            s_axi_wvalid[i] = axi_wvalid[i];
-            s_axi_wready[i] = axi_wready[i];
-            s_axi_bid[i] = axi_bid[i];
-            s_axi_bresp[i] = axi_bresp[i];
-            s_axi_buser[i] = axi_buser[i];
-            s_axi_bvalid[i] = axi_bvalid[i];
-            s_axi_bready[i] = axi_bready[i];
-            s_axi_arid[i] = axi_arid[i];
-            s_axi_araddr[i] = axi_araddr[i];
-            s_axi_arlen[i] = axi_arlen[i];
-            s_axi_arsize[i] = axi_arsize[i];
-            s_axi_arburst[i] = axi_arburst[i];
-            s_axi_arlock[i] = axi_arlock[i];
-            s_axi_arcache[i] = axi_arcache[i];
-            s_axi_arprot[i] = axi_arprot[i];
-            s_axi_arqos[i] = axi_arqos[i];
-            s_axi_aruser[i] = axi_aruser[i];
-            s_axi_arvalid[i] = axi_arvalid[i];
-            s_axi_arready[i] = axi_arready[i];
-            s_axi_rid[i] = axi_rid[i];
-            s_axi_rdata[i] = axi_rdata[i];
-            s_axi_rresp[i] = axi_rresp[i];
-            s_axi_rlast[i] = axi_rlast[i];
-            s_axi_ruser[i] = axi_ruser[i];
-            s_axi_rvalid[i] = axi_rvalid[i];
-            s_axi_rready[i] = axi_rready[i];
-        }        
-    }
+    // axi_if s_vif [S_COUNT]{
+    //     for (i=0; i<S_COUNT; i=i+1){
+    //         s_axi_awid[i] <= axi_awid[i];
+    //         s_axi_awaddr[i] <= axi_awaddr[i];
+    //         s_axi_awlen[i] <= axi_awlen[i];
+    //         s_axi_awsize[i] <= axi_awsize[i];
+    //         s_axi_awburst[i] <= axi_awburst[i];
+    //         s_axi_awlock[i] <= axi_awlock[i];
+    //         s_axi_awcache[i] <= axi_awcache[i];
+    //         s_axi_awprot[i] <= axi_awprot[i];
+    //         s_axi_awqos[i] <= axi_awqos[i];
+    //         s_axi_awuser[i] <= axi_awuser[i];
+    //         s_axi_awvalid[i] <= axi_awvalid[i];
+    //         s_axi_awready[i] <= axi_awready[i];
+    //         s_axi_wdata[i] <= axi_wdata[i];
+    //         s_axi_wstrb[i] <= axi_wstrb[i];
+    //         s_axi_wlast[i] <= axi_wlast[i];
+    //         s_axi_wuser[i] <= axi_wuser[i];
+    //         s_axi_wvalid[i] <= axi_wvalid[i];
+    //         s_axi_wready[i] <= axi_wready[i];
+    //         s_axi_bid[i] <= axi_bid[i];
+    //         s_axi_bresp[i] <= axi_bresp[i];
+    //         s_axi_buser[i] <= axi_buser[i];
+    //         s_axi_bvalid[i] <= axi_bvalid[i];
+    //         s_axi_bready[i] <= axi_bready[i];
+    //         s_axi_arid[i] <= axi_arid[i];
+    //         s_axi_araddr[i] <= axi_araddr[i];
+    //         s_axi_arlen[i] <= axi_arlen[i];
+    //         s_axi_arsize[i] <= axi_arsize[i];
+    //         s_axi_arburst[i] <= axi_arburst[i];
+    //         s_axi_arlock[i] <= axi_arlock[i];
+    //         s_axi_arcache[i] <= axi_arcache[i];
+    //         s_axi_arprot[i] <= axi_arprot[i];
+    //         s_axi_arqos[i] <= axi_arqos[i];
+    //         s_axi_aruser[i] <= axi_aruser[i];
+    //         s_axi_arvalid[i] <= axi_arvalid[i];
+    //         s_axi_arready[i] <= axi_arready[i];
+    //         s_axi_rid[i] <= axi_rid[i];
+    //         s_axi_rdata[i] <= axi_rdata[i];
+    //         s_axi_rresp[i] <= axi_rresp[i];
+    //         s_axi_rlast[i] <= axi_rlast[i];
+    //         s_axi_ruser[i] <= axi_ruser[i];
+    //         s_axi_rvalid[i] <= axi_rvalid[i];
+    //         s_axi_rready[i] <= axi_rready[i];
+    //     }        
+    // }
 
     initial begin
         uvm_config_db#(virtual axi_if)::set(uvm_root::get(), "uvm_test_top", "axi_if", vif);
