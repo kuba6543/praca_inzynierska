@@ -1,6 +1,6 @@
 class axi_transaction extends uvm_sequence_item;
     
-    enum {AW, AR, W, B, R} transaction_type;
+    transaction_type_t transaction_type;
 
     /*
      * AXI input interfaces

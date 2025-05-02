@@ -283,113 +283,126 @@ axi_interconnect_inst (
 );
 
     always #(CLK/2) clk = ~clk;   //generate clock
+    
+    axi_if m_vif [M_COUNT]();  // Instantiate master interface array
+    axi_if s_vif [S_COUNT]();  // Instantiate slave interface array
 
     initial begin
         clk = 0;
         rst = 1;
         #10 rst = 0;
-    end
+//    end
     
-    axi_if vif(clk, rst);
 
-    // axi_if m_vif [M_COUNT]{
-    //     for (i=0; i<M_COUNT; i=i+1){
-    //         axi_awid[i] <= m_axi_awid[i];
-    //         axi_awaddr[i] <= m_axi_awaddr[i];
-    //         axi_awlen[i] <= m_axi_awlen[i];
-    //         axi_awsize[i] <= m_axi_awsize[i];
-    //         axi_awburst[i] <= m_axi_awburst[i];
-    //         axi_awlock[i] <= m_axi_awlock[i];
-    //         axi_awcache[i] <= m_axi_awcache[i];
-    //         axi_awprot[i] <= m_axi_awprot[i];
-    //         axi_awqos[i] <= m_axi_awqos[i];
-    //         axi_awregion[i] <= m_axi_awregion[i];
-    //         axi_awuser[i] <= m_axi_awuser[i];
-    //         axi_awvalid[i] <= m_axi_awvalid[i];
-    //         axi_awready[i] <= m_axi_awready[i];
-    //         axi_wdata[i] <= m_axi_wdata[i];
-    //         axi_wstrb[i] <= m_axi_wstrb[i];
-    //         axi_wlast[i] <= m_axi_wlast[i];
-    //         axi_wuser[i] <= m_axi_wuser[i];
-    //         axi_wvalid[i] <= m_axi_wvalid[i];
-    //         axi_wready[i] <= m_axi_wready[i];
-    //         axi_bid[i] <= m_axi_bid[i];
-    //         axi_bresp[i] <= m_axi_bresp[i];
-    //         axi_buser[i] <= m_axi_buser[i];
-    //         axi_bvalid[i] <= m_axi_bvalid[i];
-    //         axi_bready[i] <= m_axi_bready[i];
-    //         axi_arid[i] <= m_axi_arid[i];
-    //         axi_araddr[i] <= m_axi_araddr[i];
-    //         axi_arlen[i] <= m_axi_arlen[i];
-    //         axi_arsize[i] <= m_axi_arsize[i];
-    //         axi_arburst[i] <= m_axi_arburst[i];
-    //         axi_arlock[i] <= m_axi_arlock[i];
-    //         axi_arcache[i] <= m_axi_arcache[i];
-    //         axi_arprot[i] <= m_axi_arprot[i];
-    //         axi_arqos[i] <= m_axi_arqos[i];
-    //         axi_arregion[i] <= m_axi_arregion[i];
-    //         axi_aruser[i] <= m_axi_aruser[i];
-    //         axi_arvalid[i] <= m_axi_arvalid[i];
-    //         axi_arready[i] <= m_axi_arready[i];
-    //         axi_rid[i] <= m_axi_rid[i];
-    //         axi_rdata[i] <= m_axi_rdata[i];
-    //         axi_rresp[i] <= m_axi_rresp[i];
-    //         axi_rlast[i] <= m_axi_rlast[i];
-    //         axi_ruser[i] <= m_axi_ruser[i];
-    //         axi_rvalid[i] <= m_axi_rvalid[i];
-    //         axi_rready[i] <= m_axi_rready[i];
-    //     }
-    // }
+    // Generate block for connecting each interface
 
-    // axi_if s_vif [S_COUNT]{
-    //     for (i=0; i<S_COUNT; i=i+1){
-    //         s_axi_awid[i] <= axi_awid[i];
-    //         s_axi_awaddr[i] <= axi_awaddr[i];
-    //         s_axi_awlen[i] <= axi_awlen[i];
-    //         s_axi_awsize[i] <= axi_awsize[i];
-    //         s_axi_awburst[i] <= axi_awburst[i];
-    //         s_axi_awlock[i] <= axi_awlock[i];
-    //         s_axi_awcache[i] <= axi_awcache[i];
-    //         s_axi_awprot[i] <= axi_awprot[i];
-    //         s_axi_awqos[i] <= axi_awqos[i];
-    //         s_axi_awuser[i] <= axi_awuser[i];
-    //         s_axi_awvalid[i] <= axi_awvalid[i];
-    //         s_axi_awready[i] <= axi_awready[i];
-    //         s_axi_wdata[i] <= axi_wdata[i];
-    //         s_axi_wstrb[i] <= axi_wstrb[i];
-    //         s_axi_wlast[i] <= axi_wlast[i];
-    //         s_axi_wuser[i] <= axi_wuser[i];
-    //         s_axi_wvalid[i] <= axi_wvalid[i];
-    //         s_axi_wready[i] <= axi_wready[i];
-    //         s_axi_bid[i] <= axi_bid[i];
-    //         s_axi_bresp[i] <= axi_bresp[i];
-    //         s_axi_buser[i] <= axi_buser[i];
-    //         s_axi_bvalid[i] <= axi_bvalid[i];
-    //         s_axi_bready[i] <= axi_bready[i];
-    //         s_axi_arid[i] <= axi_arid[i];
-    //         s_axi_araddr[i] <= axi_araddr[i];
-    //         s_axi_arlen[i] <= axi_arlen[i];
-    //         s_axi_arsize[i] <= axi_arsize[i];
-    //         s_axi_arburst[i] <= axi_arburst[i];
-    //         s_axi_arlock[i] <= axi_arlock[i];
-    //         s_axi_arcache[i] <= axi_arcache[i];
-    //         s_axi_arprot[i] <= axi_arprot[i];
-    //         s_axi_arqos[i] <= axi_arqos[i];
-    //         s_axi_aruser[i] <= axi_aruser[i];
-    //         s_axi_arvalid[i] <= axi_arvalid[i];
-    //         s_axi_arready[i] <= axi_arready[i];
-    //         s_axi_rid[i] <= axi_rid[i];
-    //         s_axi_rdata[i] <= axi_rdata[i];
-    //         s_axi_rresp[i] <= axi_rresp[i];
-    //         s_axi_rlast[i] <= axi_rlast[i];
-    //         s_axi_ruser[i] <= axi_ruser[i];
-    //         s_axi_rvalid[i] <= axi_rvalid[i];
-    //         s_axi_rready[i] <= axi_rready[i];
-    //     }        
-    // }
+    for (int i = 0; i < M_COUNT; i = i + 1) begin
 
-    initial begin
-        uvm_config_db#(virtual axi_if)::set(uvm_root::get(), "uvm_test_top", "axi_if", vif);
+    assign m_vif[i].axi_awid                                        = m_axi_awid[(i+1)*ID_WIDTH-1:i*ID_WIDTH];
+    assign m_vif[i].axi_awaddr                                      = m_axi_awaddr[(i+1)*ADDR_WIDTH-1:i*ADDR_WIDTH];
+    assign m_vif[i].axi_awlen                                       = m_axi_awlen[(i+1)*8-1:i*8];
+    assign m_vif[i].axi_awsize                                      = m_axi_awsize[(i+1)*3-1:i*3];
+    assign m_vif[i].axi_awburst                                     = m_axi_awburst[((i+1)*2)-1:i*2];
+    assign m_vif[i].axi_awlock                                      = m_axi_awlock[i];
+    assign m_vif[i].axi_awcache                                     = m_axi_awcache[((i+1)*4)-1:i*4];
+    assign m_vif[i].axi_awprot                                      = m_axi_awprot[((i+1)*3)-1:i*3];
+    assign m_vif[i].axi_awqos                                       = m_axi_awqos[((i+1)*4)-1:i*4];
+    assign m_vif[i].axi_awregion                                    = m_axi_awregion[((i+1)*4)-1:i*4];
+    assign m_vif[i].axi_awuser                                      = m_axi_awuser[(i+1)*AWUSER_WIDTH-1:i*AWUSER_WIDTH];
+    assign m_vif[i].axi_awvalid                                     = m_axi_awvalid[i];
+    assign m_axi_awready[i]                                         = m_vif[i].axi_awready;
+
+    assign m_vif[i].axi_wdata                                       = m_axi_wdata[(i+1)*DATA_WIDTH-1:i*DATA_WIDTH];
+    assign m_vif[i].axi_wstrb                                       = m_axi_wstrb[(i+1)*STRB_WIDTH-1:i*STRB_WIDTH];
+    assign m_vif[i].axi_wlast                                       = m_axi_wlast[i];
+    assign m_vif[i].axi_wuser                                       = m_axi_wuser[(i+1)*WUSER_WIDTH-1:i*WUSER_WIDTH];
+    assign m_vif[i].axi_wvalid                                      = m_axi_wvalid[i];
+    assign m_axi_wready[i]                                          = m_vif[i].axi_wready;
+
+    assign m_axi_bid[(i+1)*ID_WIDTH-1:i*ID_WIDTH]                   = m_vif[i].axi_bid;
+    assign m_axi_bresp[(i+1)*2-1:i*2]                               = m_vif[i].axi_bresp;
+    assign m_axi_buser[(i+1)*BUSER_WIDTH-1:i*BUSER_WIDTH]           = m_vif[i].axi_buser;
+    assign m_axi_bvalid[i]                                          = m_vif[i].axi_bvalid;
+    assign m_vif[i].axi_bready                                      = m_axi_bready[i];
+
+    assign m_vif[i].axi_arid                                        = m_axi_arid[(i+1)*ID_WIDTH-1:i*ID_WIDTH];
+    assign m_vif[i].axi_araddr                                      = m_axi_araddr[(i+1)*ADDR_WIDTH-1:i*ADDR_WIDTH];
+    assign m_vif[i].axi_arlen                                       = m_axi_arlen[(i+1)*8-1:i*8];
+    assign m_vif[i].axi_arsize                                      = m_axi_arsize[(i+1)*3-1:i*3];
+    assign m_vif[i].axi_arburst                                     = m_axi_arburst[((i+1)*2)-1:i*2];
+    assign m_vif[i].axi_arlock                                      = m_axi_arlock[i];
+    assign m_vif[i].axi_arcache                                     = m_axi_arcache[((i+1)*4)-1:i*4];
+    assign m_vif[i].axi_arprot                                      = m_axi_arprot[i];
+    assign m_vif[i].axi_arqos                                       = m_axi_arqos[((i+1)*4)-1:i*4];
+    assign m_vif[i].axi_arregion                                    = m_axi_arregion[((i+1)*4)-1:i*4];
+    assign m_vif[i].axi_aruser                                      = m_axi_aruser[(i+1)*ARUSER_WIDTH-1:i*ARUSER_WIDTH];
+    assign m_vif[i].axi_arvalid                                     = m_axi_arvalid[i];
+    assign m_axi_arready[i]                                         = m_vif[i].axi_arready;
+
+    assign m_axi_rid[(i+1)*ID_WIDTH-1:i*ID_WIDTH]                   = m_vif[i].axi_rid;
+    assign m_axi_rdata[(i+1)*DATA_WIDTH-1:i*DATA_WIDTH]             = m_vif[i].axi_rdata;
+    assign m_axi_rresp[((i+1)*2)-1:i*2]                             = m_vif[i].axi_rresp;
+    assign m_axi_rlast[i]                                           = m_vif[i].axi_rlast;
+    assign m_axi_ruser[i]                                           = m_vif[i].axi_ruser;
+    assign m_axi_rvalid[i]                                          = m_vif[i].axi_rvalid;
+    assign m_vif[i].axi_rready                                      = m_axi_rready[i];
+
+    end
+
+    for (int i = 0; i < S_COUNT; i = i + 1) begin
+
+        assign s_axi_awid[(i+1)*ID_WIDTH-1:i*ID_WIDTH]              = s_vif[i].axi_awid;
+        assign s_axi_awaddr[(i+1)*ADDR_WIDTH-1:i*ADDR_WIDTH]        = s_vif[i].axi_awaddr;
+        assign s_axi_awlen[(i+1)*8-1:i*8]                           = s_vif[i].axi_awlen;
+        assign s_axi_awsize[(i+1)*3-1:i*3]                          = s_vif[i].axi_awsize;
+        assign s_axi_awburst[((i+1)*2)-1:i*2]                       = s_vif[i].axi_awburst;
+        assign s_axi_awlock[i]                                      = s_vif[i].axi_awlock;
+        assign s_axi_awcache[((i+1)*4)-1:i*4]                       = s_vif[i].axi_awcache;
+        assign s_axi_awprot[((i+1)*3)-1:i*3]                        = s_vif[i].axi_awprot;
+        assign s_axi_awqos[((i+1)*4)-1:i*4]                         = s_vif[i].axi_awqos;
+        assign s_axi_awuser[(i+1)*AWUSER_WIDTH-1:i*AWUSER_WIDTH]    = s_vif[i].axi_awuser;
+        assign s_axi_awvalid[i]                                     = s_vif[i].axi_awvalid;
+        assign s_vif[i].axi_awready                                 = s_axi_awready[i];
+    
+        assign s_axi_wdata[(i+1)*DATA_WIDTH-1:i*DATA_WIDTH]         = s_vif[i].axi_wdata;
+        assign s_axi_wstrb[(i+1)*STRB_WIDTH-1:i*STRB_WIDTH]         = s_vif[i].axi_wstrb;
+        assign s_axi_wlast[i]                                       = s_vif[i].axi_wlast;
+        assign s_axi_wuser[(i+1)*WUSER_WIDTH-1:i*WUSER_WIDTH]       = s_vif[i].axi_wuser;
+        assign s_axi_wvalid[i]                                      = s_vif[i].axi_wvalid;
+        assign s_vif[i].axi_wready                                  = s_axi_wready[i];
+    
+        assign s_vif[i].axi_bid                                     = s_axi_bid[(i+1)*ID_WIDTH-1:i*ID_WIDTH];
+        assign s_vif[i].axi_bresp                                   = s_axi_bresp[(i+1)*2-1:i*2];
+        assign s_vif[i].axi_buser                                   = s_axi_buser[(i+1)*BUSER_WIDTH-1:i*BUSER_WIDTH];
+        assign s_vif[i].axi_bvalid                                  = s_axi_bvalid[i];
+        assign s_axi_bready[i]                                      = s_vif[i].axi_bready;
+    
+        assign s_axi_arid[(i+1)*ID_WIDTH-1:i*ID_WIDTH]              = s_vif[i].axi_arid;
+        assign s_axi_araddr[(i+1)*ADDR_WIDTH-1:i*ADDR_WIDTH]        = s_vif[i].axi_araddr;
+        assign s_axi_arlen[(i+1)*8-1:i*8]                           = s_vif[i].axi_arlen;
+        assign s_axi_arsize[(i+1)*3-1:i*3]                          = s_vif[i].axi_arsize;
+        assign s_axi_arburst[((i+1)*2)-1:i*2]                       = s_vif[i].axi_arburst;
+        assign s_axi_arlock[i]                                      = s_vif[i].axi_arlock;
+        assign s_axi_arcache[((i+1)*4)-1:i*4]                       = s_vif[i].axi_arcache;
+        assign s_axi_arprot[((i+1)*3)-1:i*3]                        = s_vif[i].axi_arprot;
+        assign s_axi_arqos[((i+1)*4)-1:i*4]                         = s_vif[i].axi_arqos;
+        assign s_axi_aruser[(i+1)*ARUSER_WIDTH-1:i*ARUSER_WIDTH]    = s_vif[i].axi_aruser;
+        assign s_axi_arvalid[i]                                     = s_vif[i].axi_arvalid;
+        assign s_vif[i].axi_arready                                 = s_axi_arready[i];
+    
+        assign s_vif[i].axi_rid                                     = s_axi_rid[(i+1)*ID_WIDTH-1:i*ID_WIDTH];
+        assign s_vif[i].axi_rdata                                   = s_axi_rdata[(i+1)*DATA_WIDTH-1:i*DATA_WIDTH];
+        assign s_vif[i].axi_rresp                                   = s_axi_rresp[((i+1)*2)-1:i*2];
+        assign s_vif[i].axi_rlast                                   = s_axi_rlast[i];
+        assign s_vif[i].axi_ruser                                   = s_axi_ruser[(i+1)*RUSER_WIDTH-1:i*RUSER_WIDTH];
+        assign s_vif[i].axi_rvalid                                  = s_axi_rvalid[i];
+        assign s_axi_rready[i]                                      = s_vif[i].axi_rready;
+
+    end
+
+//    initial begin
+        for (int i = 0; i < M_COUNT; i = i + 1) uvm_config_db#(virtual axi_if)::set(null, "env.axi_master_agent_inst[%0d]", "vif", sformatf("m_vif[%0d]", i));
+        for (int i = 0; i < S_COUNT; i = i + 1) uvm_config_db#(virtual axi_if)::set(null, "env.axi_slave_agent_inst[%0d]", "vif", sformatf("s_vif[%0d]", i));
         run_test("axi_test");
     end
 

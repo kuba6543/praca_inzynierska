@@ -15,7 +15,7 @@ class axi_sequence extends uvm_sequence#(axi_transaction);
         `uvm_info("SEQ", $sformatf("Generated transaction:\n%s", transaction.sprint()), UVM_MEDIUM)
         send_request(transaction);
         wait_for_item_done();
-        get_response(vif.m_axi_rresp); 
+//        get_response(vif.m_axi_rresp); 
 
     endtask
 

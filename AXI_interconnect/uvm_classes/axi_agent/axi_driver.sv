@@ -1,12 +1,11 @@
 class axi_driver extends uvm_driver #(axi_transaction);
-
-    bit is_slave = 0;
     
     `include "../../parameters.svh"
 
     virtual interface axi_if vif;
     axi_sequence seq;
-  
+    bit is_slave = 0;
+
     `uvm_component_utils(axi_driver)
 
     function new (string name, uvm_component parent);
@@ -86,8 +85,8 @@ class axi_driver extends uvm_driver #(axi_transaction);
         vif.axi_rready  <= 0;
     endtask: reset
 
-    task write_addr();
-        axi_transaction w_tr;
+    task write_addr(axi_transaction w_tr);
+//        axi_transaction w_tr;
 
         // send transaction
         vif.axi_awvalid <= 1'b1;

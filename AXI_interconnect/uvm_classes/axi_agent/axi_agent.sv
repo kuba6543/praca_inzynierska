@@ -1,13 +1,16 @@
 class axi_agent extends uvm_agent;
-  //declaring agent components
+  	// declaring agent components
     axi_driver    driver;
     axi_sequencer sequencer;
     axi_monitor   monitor;
 
-  // UVM automation macros for general components
+	// hold parameter if the agent is slave
+    bit is_slave = 0;
+
+  	// UVM automation macros for general components
     `uvm_component_utils(axi_agent)
 
-  // constructor of AXI agent
+  	// constructor of AXI agent
     function new (string name, uvm_component parent);
         super.new(name, parent);
     endfunction : new
@@ -22,7 +25,7 @@ class axi_agent extends uvm_agent;
         monitor = axi_monitor::type_id::create("monitor", this);
     endfunction : build_phase
 
-  // connect driver with sequencer if the agent is active
+  	// connect driver with sequencer if the agent is active
     function void connect_phase(uvm_phase phase);
         if(get_is_active() == UVM_ACTIVE) begin
         driver.seq_item_port.connect(sequencer.seq_item_export);
