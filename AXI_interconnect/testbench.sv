@@ -291,12 +291,12 @@ axi_interconnect_inst (
         clk = 0;
         rst = 1;
         #10 rst = 0;
-//    end
+    end
     
 
     // Generate block for connecting each interface
-
-    for (int i = 0; i < M_COUNT; i = i + 1) begin
+    generate
+    for (genvar i = 0; i < M_COUNT; i = i + 1) begin
 
     assign m_vif[i].axi_awid                                        = m_axi_awid[i*ID_WIDTH +: ID_WIDTH];
     assign m_vif[i].axi_awaddr                                      = m_axi_awaddr[i*ADDR_WIDTH +: ADDR_WIDTH];
@@ -349,7 +349,7 @@ axi_interconnect_inst (
 
     end
 
-    for (int i = 0; i < S_COUNT; i = i + 1) begin
+    for (genvar i = 0; i < S_COUNT; i = i + 1) begin
 
         assign s_axi_awid[i*ID_WIDTH +: ID_WIDTH]                   = s_vif[i].axi_awid;
         assign s_axi_awaddr[i*ADDR_WIDTH +: ADDR_WIDTH]             = s_vif[i].axi_awaddr;
@@ -399,8 +399,9 @@ axi_interconnect_inst (
         assign s_axi_rready[i]                                      = s_vif[i].axi_rready;
 
     end
+    endgenerate
 
-//    initial begin
+    initial begin
         for (int i = 0; i < M_COUNT; i = i + 1) uvm_config_db#(virtual axi_if)::set(null, "env.axi_master_agent_inst[%0d]", "vif", sformatf("m_vif[%0d]", i));
         for (int i = 0; i < S_COUNT; i = i + 1) uvm_config_db#(virtual axi_if)::set(null, "env.axi_slave_agent_inst[%0d]", "vif", sformatf("s_vif[%0d]", i));
         run_test("axi_test");
