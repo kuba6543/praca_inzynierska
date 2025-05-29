@@ -1,64 +1,64 @@
-interface axi_if(input logic clk, reset);
+interface axi_if(input logic clk);
 
     `include "parameters.svh"
 
     // AXI Address Write
 
-    wire [ID_WIDTH-1:0]     axi_awid;
-    wire [ADDR_WIDTH-1:0]   axi_awaddr;
-    wire [7:0]              axi_awlen;
-    wire [2:0]              axi_awsize;
-    wire [1:0]              axi_awburst;
-    wire                    axi_awlock;
-    wire [5:0]              axi_awcache;
-    wire [2:0]              axi_awprot;
-    wire [3:0]              axi_awqos;
-    wire [3:0]              axi_awregion;
-    wire [AWUSER_WIDTH-1:0] axi_awuser;
-    wire                    axi_awvalid;
-    wire                    axi_awready;
+    reg [ID_WIDTH-1:0]     axi_awid;
+    reg [ADDR_WIDTH-1:0]   axi_awaddr;
+    reg [7:0]              axi_awlen;
+    reg [2:0]              axi_awsize;
+    reg [1:0]              axi_awburst;
+    reg                    axi_awlock;
+    reg [5:0]              axi_awcache;
+    reg [2:0]              axi_awprot;
+    reg [3:0]              axi_awqos;
+    reg [3:0]              axi_awregion;
+    reg [AWUSER_WIDTH-1:0] axi_awuser;
+    reg                    axi_awvalid;
+    reg                    axi_awready;
 
    // AXI Write
 
-    wire [DATA_WIDTH-1:0]   axi_wdata;
-    wire [STRB_WIDTH-1:0]   axi_wstrb;
-    wire                    axi_wlast;
-    wire [WUSER_WIDTH-1:0]  axi_wuser;
-    wire                    axi_wvalid;
-    wire                    axi_wready;
+    reg [DATA_WIDTH-1:0]   axi_wdata;
+    reg [STRB_WIDTH-1:0]   axi_wstrb;
+    reg                    axi_wlast;
+    reg [WUSER_WIDTH-1:0]  axi_wuser;
+    reg                    axi_wvalid;
+    reg                    axi_wready;
 
    // AXI Write Response
 
-    wire [ID_WIDTH-1:0]     axi_bid;
-    wire [1:0]              axi_bresp;
-    wire [BUSER_WIDTH-1:0]  axi_buser;
-    wire                    axi_bvalid;
-    wire                    axi_bready;
+    reg [ID_WIDTH-1:0]     axi_bid;
+    reg [1:0]              axi_bresp;
+    reg [BUSER_WIDTH-1:0]  axi_buser;
+    reg                    axi_bvalid;
+    reg                    axi_bready;
 
    // AXI Address Read
 
-    wire [ID_WIDTH-1:0]     axi_arid;
-    wire [ADDR_WIDTH-1:0]   axi_araddr;
-    wire [7:0]              axi_arlen;
-    wire [2:0]              axi_arsize;
-    wire [1:0]              axi_arburst;
-    wire                    axi_arlock;
-    wire [3:0]              axi_arcache;
-    wire [2:0]              axi_arprot;
-    wire [3:0]              axi_arqos;
-    wire [3:0]              axi_arregion;
-    wire [ARUSER_WIDTH-1:0] axi_aruser;
-    wire                    axi_arvalid;
-    wire                    axi_arready;
+    reg [ID_WIDTH-1:0]     axi_arid;
+    reg [ADDR_WIDTH-1:0]   axi_araddr;
+    reg [7:0]              axi_arlen;
+    reg [2:0]              axi_arsize;
+    reg [1:0]              axi_arburst;
+    reg                    axi_arlock;
+    reg [3:0]              axi_arcache;
+    reg [2:0]              axi_arprot;
+    reg [3:0]              axi_arqos;
+    reg [3:0]              axi_arregion;
+    reg [ARUSER_WIDTH-1:0] axi_aruser;
+    reg                    axi_arvalid;
+    reg                    axi_arready;
 
     // AXI Read
 
-    wire [ID_WIDTH-1:0]     axi_rid;
-    wire [DATA_WIDTH-1:0]   axi_rdata;
-    wire [1:0]              axi_rresp;
-    wire                    axi_rlast;
-    wire [RUSER_WIDTH-1:0]  axi_ruser;
-    wire                    axi_rvalid;
-    wire                    axi_rready;
+    reg [ID_WIDTH-1:0]     axi_rid;
+    reg [DATA_WIDTH-1:0]   axi_rdata;
+    reg [1:0]              axi_rresp;
+    reg                    axi_rlast;
+    reg [RUSER_WIDTH-1:0]  axi_ruser;
+    reg                    axi_rvalid;
+    reg                    axi_rready;
 
 endinterface

@@ -3,7 +3,7 @@ class axi_monitor extends uvm_monitor;
     //declaring monitor components
     virtual interface axi_if   vif;
     uvm_analysis_port #(axi_transaction) axi_analysis_port;
-    axi_sequence trans_collected;
+    axi_transaction trans_collected;
 
     // UVM automation macros for general components
     `uvm_component_utils(axi_monitor)
@@ -21,7 +21,7 @@ class axi_monitor extends uvm_monitor;
     endfunction: build_phase
 
     virtual task run_phase(uvm_phase phase);
-        trans_collected = new();
+        trans_collected = axi_transaction::type_id::create("trans_collected");
         axi_analysis_port.write(trans_collected);
     endtask : run_phase
 

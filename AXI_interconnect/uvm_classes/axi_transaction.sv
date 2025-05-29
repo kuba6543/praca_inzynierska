@@ -15,6 +15,7 @@ class axi_transaction extends uvm_sequence_item;
     rand bit [4-1:0]            axi_awcache;
     rand bit [3-1:0]            axi_awprot;
     rand bit [4-1:0]            axi_awqos;
+    rand bit [3:0]              axi_awregion;
     rand bit [AWUSER_WIDTH-1:0] axi_awuser;
     rand bit [1:0]              axi_awvalid;
     rand bit [DATA_WIDTH-1:0]   axi_wdata;
@@ -53,11 +54,6 @@ class axi_transaction extends uvm_sequence_item;
     rand bit [1:0]              axi_rlast;
     rand bit [RUSER_WIDTH-1:0]  axi_ruser;
     rand bit [1:0]              axi_rvalid;
-
-    /*
-     * AXI master output interfaces
-     */
-
 
     `uvm_object_utils_begin(axi_transaction)
         `uvm_field_int(axi_awid, UVM_ALL_ON)

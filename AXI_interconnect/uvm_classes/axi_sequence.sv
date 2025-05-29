@@ -1,4 +1,4 @@
-class axi_sequence extends uvm_sequence#(axi_transaction);
+class axi_sequence extends uvm_sequence #(axi_transaction);
 
     `uvm_object_utils(axi_sequence)
 
