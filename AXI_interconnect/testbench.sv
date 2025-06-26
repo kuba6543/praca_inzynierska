@@ -400,10 +400,9 @@ axi_interconnect_inst (
     end
     endgenerate
   
-    
     initial begin
-        for (int i = 0; i < M_COUNT; i = i + 1) uvm_config_db#(virtual axi_if)::set(null, "env.axi_master_agent_inst[%0d]", "vif", $sformatf("m_vif[%0d]", i));
-        for (int i = 0; i < S_COUNT; i = i + 1) uvm_config_db#(virtual axi_if)::set(null, "env.axi_slave_agent_inst[%0d]", "vif", $sformatf("s_vif[%0d]", i));
+        for (int i = 0; i < M_COUNT; i = i + 1) uvm_config_db#(virtual axi_if)::set(null, $sformatf("env.axi_master_agent_inst[%0d]", i), "vif", $sformatf("m_vif[%0d]", i));
+        for (int i = 0; i < S_COUNT; i = i + 1) uvm_config_db#(virtual axi_if)::set(null, $sformatf("env.axi_slave_agent_inst[%0d]", i), "vif", $sformatf("s_vif[%0d]", i));
         run_test("axi_test");
     end
 
