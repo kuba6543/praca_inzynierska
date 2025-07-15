@@ -18,9 +18,9 @@ class axi_test extends uvm_test;
 		seq = axi_sequence::type_id::create("seq");
 		
 	    for (int i = 0; i < S_COUNT; i = i + 1)
-    	seq.start(env.axi_slave_agent_inst[i].sequencer);
+    	seq.start(env.axi_slave_agent_[i].sequencer);
         for (int i = 0; i < M_COUNT; i = i + 1)
-    	seq.start(env.axi_master_agent_inst[i].sequencer);
+    	seq.start(env.axi_master_agent_[i].sequencer);
 	endtask : run_phase
 
 endclass : axi_test

@@ -1,12 +1,12 @@
 class axi_scoreboard extends uvm_scoreboard;
 
-//     `uvm_component_utils(axi_scoreboard)
+     `uvm_component_utils(axi_scoreboard)
 //     uvm_analysis_imp #(axi_transaction, axi_scoreboard) monitor_collected_data;
 //     uvm_analysis_imp #(axi_transaction, axi_scoreboard) predictor_collected_data;
-//     // constructor of scoreboard
-//     function new (string name, uvm_component parent);
-//         super.new(name, parent);
-//     endfunction : new
+     // constructor of scoreboard
+     function new (string name, uvm_component parent);
+         super.new(name, parent);
+     endfunction : new
 
 //     function void build_phase(uvm_phase phase);
 //         super.build_phase(phase);
