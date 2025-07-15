@@ -290,8 +290,8 @@ axi_interconnect_inst (
         #10 rst = 0;
     end
     
-    axi_if m_vif [M_COUNT] (); // Instantiate physical master interface array
-    axi_if s_vif [S_COUNT] (); // Instantiate physical slave interface array
+    axi_if m_vif[M_COUNT] (); // Instantiate physical master interface array
+    axi_if s_vif[S_COUNT] (); // Instantiate physical slave interface array
 
     // Generate block for connecting each interface
     generate
@@ -398,22 +398,38 @@ axi_interconnect_inst (
         assign s_axi_rready[i]                                      = s_vif[i].axi_rready;
 
     end
+    
+    for (genvar i = 0; i < S_COUNT; i++) begin
+        initial begin
+            string path;
+            path = $sformatf("uvm_test_top.env.env.axi_agent_slave_%0d", i);
+            uvm_config_db#(virtual axi_if)::set(null, path, "vif", s_vif[i]);
+        end
+    end
+    
+    for (genvar i = 0; i < M_COUNT; i++) begin
+        initial begin
+            string path;
+            path = $sformatf("uvm_test_top.env.env.axi_agent_master_%0d", i);
+            uvm_config_db#(virtual axi_if)::set(null, path, "vif", m_vif[i]);
+        end
+    end
+    
     endgenerate
   
     initial begin
-//        for (int i = 0; i < M_COUNT; i = i + 1) uvm_config_db#(virtual axi_if)::set(null, $sformatf("env.axi_master_agent_inst[%0d]", i), "vif", m_vif[i]);
-//        for (int i = 0; i < S_COUNT; i = i + 1) uvm_config_db#(virtual axi_if)::set(null, $sformatf("env.axi_slave_agent_inst[%0d]", i), "vif", s_vif[i]);
+//        for (int i = 0; i < M_COUNT; i = i + 1) uvm_config_db#(virtual axi_if)::set(null, $sformatf("env.axi_agent_master_%0d", i), "vif", master_interface);
+//        for (int i = 0; i < S_COUNT; i = i + 1) uvm_config_db#(virtual axi_if)::set(null, $sformatf("env.axi_agent_slave_%0d", i), "vif", slave_interface);
         
-        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_master_0", "vif", m_vif[0]);
-        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_slave_0", "vif", s_vif[0]);
-        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_master_1", "vif", m_vif[1]);
-        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_slave_1", "vif", s_vif[1]);
-        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_master_2", "vif", m_vif[2]);
-        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_slave_2", "vif", s_vif[2]);
-        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_master_3", "vif", m_vif[3]);
-        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_slave_3", "vif", s_vif[3]);
-        
-        
+//        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_master_0", "vif", m_vif[0]);
+//        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_slave_0", "vif", s_vif[0]);
+//        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_master_1", "vif", m_vif[1]);
+//        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_slave_1", "vif", s_vif[1]);
+//        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_master_2", "vif", m_vif[2]);
+//        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_slave_2", "vif", s_vif[2]);
+//        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_master_3", "vif", m_vif[3]);
+//        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_slave_3", "vif", s_vif[3]);
+
         run_test("axi_test");
     end
 
