@@ -3,9 +3,9 @@ class axi_env extends uvm_env;
     `include "../parameters.svh"
 
     virtual interface axi_if vif;
-    axi_agent axi_master_agent_[S_COUNT];
-    axi_agent axi_slave_agent_[M_COUNT];
-    axi_scoreboard axi_scoreboard;
+    axi_agent axi_agent_master_[M_COUNT];
+    axi_agent axi_agent_slave_[S_COUNT];
+    axi_scoreboard scoreboard;
   
     `uvm_component_utils(axi_env)
     
@@ -18,14 +18,30 @@ class axi_env extends uvm_env;
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
         for(int i = 0; i < M_COUNT; i = i + 1) begin
-            axi_master_agent_[i] = axi_agent::type_id::create($sformatf("axi_agent_master_%0d", i), this);
-            axi_master_agent_[i].is_slave = 0;
+            axi_agent_master_[i] = axi_agent::type_id::create($sformatf("axi_agent_master_%0d", i), this);
+            axi_agent_master_[i].is_slave = 0;
         end
         for(int i = 0; i < S_COUNT; i = i + 1) begin
-            axi_slave_agent_[i] = axi_agent::type_id::create($sformatf("axi_agent_slave_%0d", i), this);
-            axi_slave_agent_[i].is_slave = 1;
+            axi_agent_slave_[i] = axi_agent::type_id::create($sformatf("axi_agent_slave_%0d", i), this);
+            axi_agent_slave_[i].is_slave = 1;
         end
-        //axi_scoreboard = axi_scoreboard::type_id::create("axi_scoreboard", this);
+        scoreboard = axi_scoreboard::type_id::create("axi_scoreboard", this);
     endfunction : build_phase
+    
+    function void connect_phase(uvm_phase phase);
+        super.connect_phase(phase);
+        for(int i = 0; i < M_COUNT; i = i + 1) begin
+            axi_agent_master_[i].monitor.axi_analysis_port.connect(scoreboard.monitor_collected_data);
+        end
+        for(int i = 0; i < S_COUNT; i = i + 1) begin
+            axi_agent_master_[i].monitor.axi_analysis_port.connect(scoreboard.monitor_collected_data);
+        end
+        uvm_top.print_topology();
+    endfunction
+    
+//    function void report_phase(uvm_phase phase);
+//        super.report_phase(phase);
+//        `uvm_info(get_full_name(), phase.get_name(), UVM_MEDIUM)
+//    endfunction : report_phase
 
 endclass : axi_env

@@ -402,7 +402,7 @@ axi_interconnect_inst (
     for (genvar i = 0; i < S_COUNT; i++) begin
         initial begin
             string path;
-            path = $sformatf("uvm_test_top.env.env.axi_agent_slave_%0d", i);
+            path = $sformatf("*axi_agent_slave_%0d*", i);
             uvm_config_db#(virtual axi_if)::set(null, path, "vif", s_vif[i]);
         end
     end
@@ -410,7 +410,7 @@ axi_interconnect_inst (
     for (genvar i = 0; i < M_COUNT; i++) begin
         initial begin
             string path;
-            path = $sformatf("uvm_test_top.env.env.axi_agent_master_%0d", i);
+            path = $sformatf("*axi_agent_master_%0d*", i);
             uvm_config_db#(virtual axi_if)::set(null, path, "vif", m_vif[i]);
         end
     end

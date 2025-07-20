@@ -18,7 +18,7 @@ class axi_monitor extends uvm_monitor;
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
         if(!uvm_config_db#(virtual axi_if)::get(this, "", "vif", vif))   
-            `uvm_fatal("NOVIF","No virtual interface specified for this instance");
+            `uvm_fatal(get_full_name(),"No virtual interface specified for this instance");
     endfunction: build_phase
 
     virtual task run_phase(uvm_phase phase);

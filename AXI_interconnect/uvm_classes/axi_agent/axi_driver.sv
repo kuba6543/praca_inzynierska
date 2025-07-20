@@ -16,7 +16,7 @@ class axi_driver extends uvm_driver#(axi_transaction);
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
         if (!uvm_config_db#(virtual axi_if)::get(this, "", "vif", vif))
-            `uvm_fatal("NOVIF","No virtual interface specified for this instance");
+            `uvm_fatal(get_full_name(),"No virtual interface specified for this instance");
     endfunction : connect_phase
 
     // UVM run_phase
