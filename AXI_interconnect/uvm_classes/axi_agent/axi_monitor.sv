@@ -22,8 +22,11 @@ class axi_monitor extends uvm_monitor;
     endfunction: build_phase
 
     virtual task run_phase(uvm_phase phase);
+        @(posedge vif.clk);
+        wait(vif.rst == 0);
         trans_collected = axi_transaction::type_id::create("trans_collected");
         axi_analysis_port.write(trans_collected);
+        `uvm_info("MON", $sformatf("Sampled transaction:\n%s", trans_collected.sprint()), UVM_MEDIUM)
     endtask : run_phase
 
 endclass : axi_monitor

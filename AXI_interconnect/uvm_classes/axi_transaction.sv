@@ -1,5 +1,6 @@
 class axi_transaction extends uvm_sequence_item;
     
+    //rand
     transaction_type_t transaction_type;
 
     /*

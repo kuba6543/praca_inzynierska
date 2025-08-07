@@ -297,6 +297,8 @@ axi_interconnect_inst (
     generate
     for (genvar i = 0; i < M_COUNT; i = i + 1) begin
 
+        assign m_vif[i].rst                                             = rst;
+        assign m_vif[i].clk                                             = clk;
         assign m_vif[i].axi_awid                                        = m_axi_awid[i*ID_WIDTH +: ID_WIDTH];
         assign m_vif[i].axi_awaddr                                      = m_axi_awaddr[i*ADDR_WIDTH +: ADDR_WIDTH];
         assign m_vif[i].axi_awlen                                       = m_axi_awlen[i*8 +: 8];
@@ -349,7 +351,9 @@ axi_interconnect_inst (
     end
 
     for (genvar i = 0; i < S_COUNT; i = i + 1) begin
-
+        
+        assign s_vif[i].rst                                             = rst;
+        assign s_vif[i].clk                                             = clk;
         assign s_axi_awid[i*ID_WIDTH +: ID_WIDTH]                   = s_vif[i].axi_awid;
         assign s_axi_awaddr[i*ADDR_WIDTH +: ADDR_WIDTH]             = s_vif[i].axi_awaddr;
         assign s_axi_awlen[i*8 +: 8]                                = s_vif[i].axi_awlen;
@@ -418,6 +422,7 @@ axi_interconnect_inst (
     endgenerate
   
     initial begin
+    
 //        for (int i = 0; i < M_COUNT; i = i + 1) uvm_config_db#(virtual axi_if)::set(null, $sformatf("env.axi_agent_master_%0d", i), "vif", master_interface);
 //        for (int i = 0; i < S_COUNT; i = i + 1) uvm_config_db#(virtual axi_if)::set(null, $sformatf("env.axi_agent_slave_%0d", i), "vif", slave_interface);
         
@@ -431,6 +436,7 @@ axi_interconnect_inst (
 //        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_slave_3", "vif", s_vif[3]);
 
         run_test("axi_test");
+        uvm_root::get().print_topology();
     end
 
 endmodule

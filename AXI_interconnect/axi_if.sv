@@ -1,4 +1,4 @@
-interface axi_if(input logic clk);
+interface axi_if(input logic clk, rst);
 
     `include "parameters.svh"
 

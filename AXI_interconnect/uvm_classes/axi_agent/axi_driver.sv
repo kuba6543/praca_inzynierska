@@ -26,14 +26,16 @@ class axi_driver extends uvm_driver#(axi_transaction);
         reset();
         forever begin
             seq_item_port.get_next_item(req);
+//            @(posedge vif.clk);
             case(req.transaction_type)
                 AW:      write_addr(req);
-                // W:       write_data(seq);
+                W:       write_data(req);
                 // B:       received_resp_write(seq);
    		        // AR:      read_addr();
                 // R:       read_data(rd_data); // + read response
     	        default: `uvm_fatal("axi_driver","No valid command")
             endcase
+            `uvm_info("DRV", $sformatf("Driving transaction:\n%s", req.sprint()), UVM_MEDIUM)
             seq_item_port.item_done();
         end
     endtask : run_phase
@@ -105,8 +107,26 @@ class axi_driver extends uvm_driver#(axi_transaction);
         //wait AWREADY
         while (!vif.axi_awready) @(posedge vif.clk);
         vif.axi_awvalid = 1'b0;
+        
+        @(posedge vif.clk);
+        
+//        `uvm_info("DRV", $sformatf("Driving transaction:\n%s", req.sprint()), UVM_MEDIUM)
+//        seq_item_port.item_done();
 
     endtask : write_addr
+    
+    task write_data(axi_transaction w_tr);
+    
+        vif.axi_wvalid = 1'b0;
+        vif.axi_wdata = w_tr.axi_wdata;
+        vif.axi_wstrb = w_tr.axi_wstrb;
+        vif.axi_wlast = w_tr.axi_wlast;
+        vif.axi_wuser = w_tr.axi_wuser;
+    
+        while(!vif.axi_wready) @(posedge vif.clk);    
+        vif.axi_wvalid = 1'b0;
+    
+    endtask : write_data;
 
 endclass : axi_driver
 
