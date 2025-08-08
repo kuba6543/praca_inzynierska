@@ -290,8 +290,8 @@ axi_interconnect_inst (
         #10 rst = 0;
     end
     
-    axi_if m_vif[M_COUNT] (); // Instantiate physical master interface array
-    axi_if s_vif[S_COUNT] (); // Instantiate physical slave interface array
+    axi_if m_vif[M_COUNT] (clk, rst); // Instantiate physical master interface array
+    axi_if s_vif[S_COUNT] (clk, rst); // Instantiate physical slave interface array
 
     // Generate block for connecting each interface
     generate
@@ -352,8 +352,8 @@ axi_interconnect_inst (
 
     for (genvar i = 0; i < S_COUNT; i = i + 1) begin
         
-        assign s_vif[i].rst                                             = rst;
-        assign s_vif[i].clk                                             = clk;
+        assign s_vif[i].rst                                         = rst;
+        assign s_vif[i].clk                                         = clk;
         assign s_axi_awid[i*ID_WIDTH +: ID_WIDTH]                   = s_vif[i].axi_awid;
         assign s_axi_awaddr[i*ADDR_WIDTH +: ADDR_WIDTH]             = s_vif[i].axi_awaddr;
         assign s_axi_awlen[i*8 +: 8]                                = s_vif[i].axi_awlen;
@@ -434,9 +434,7 @@ axi_interconnect_inst (
 //        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_slave_2", "vif", s_vif[2]);
 //        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_master_3", "vif", m_vif[3]);
 //        uvm_config_db#(virtual axi_if)::set(null, "env.axi_agent_slave_3", "vif", s_vif[3]);
-
         run_test("axi_test");
-        uvm_root::get().print_topology();
     end
 
 endmodule

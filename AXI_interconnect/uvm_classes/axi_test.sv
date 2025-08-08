@@ -3,7 +3,7 @@ class axi_test extends uvm_test;
   	`uvm_component_utils(axi_test)
 
   	axi_env        env;
-  	axi_sequence   seq;
+  	axi_sequence   seq_m, seq_s;
 
   	function new (string name = "axi_test", uvm_component parent=null);
     	super.new(name,parent);
@@ -15,13 +15,17 @@ class axi_test extends uvm_test;
   	endfunction : build_phase
 
   	task run_phase(uvm_phase phase);
+  	    uvm_root::get().print_topology();
   	    phase.raise_objection(this);
-		seq = axi_sequence::type_id::create("seq");
+		seq_s = axi_sequence::type_id::create("seq_s");
+		seq_m = axi_sequence::type_id::create("seq_m");
+
 		
 	    for (int i = 0; i < S_COUNT; i = i + 1)
-    	seq.start(env.axi_agent_slave_[i].sequencer);
-        for (int i = 0; i < M_COUNT; i = i + 1)
-    	seq.start(env.axi_agent_master_[i].sequencer);
+    	seq_s.start(env.axi_agent_slave_[i].sequencer);
+		for (int i = 0; i < M_COUNT; i = i + 1)
+    	seq_m.start(env.axi_agent_master_[i].sequencer);
+    	
     	phase.drop_objection(this);
 	endtask : run_phase
 

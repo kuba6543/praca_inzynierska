@@ -26,13 +26,18 @@ class axi_driver extends uvm_driver#(axi_transaction);
         reset();
         forever begin
             seq_item_port.get_next_item(req);
-//            @(posedge vif.clk);
+            @(posedge vif.clk);
             case(req.transaction_type)
-                AW:      write_addr(req);
-                W:       write_data(req);
-                // B:       received_resp_write(seq);
-   		        // AR:      read_addr();
-                // R:       read_data(rd_data); // + read response
+                W: begin
+                    write_addr(req);
+                    write_data(req);
+                    write_response(req);
+                end
+                R: begin
+   		            read_addr(req);
+                    read_data(req);
+                    read_response(req);
+                end
     	        default: `uvm_fatal("axi_driver","No valid command")
             endcase
             `uvm_info("DRV", $sformatf("Driving transaction:\n%s", req.sprint()), UVM_MEDIUM)
@@ -117,7 +122,7 @@ class axi_driver extends uvm_driver#(axi_transaction);
     
     task write_data(axi_transaction w_tr);
     
-        vif.axi_wvalid = 1'b0;
+        vif.axi_wvalid = 1'b1;
         vif.axi_wdata = w_tr.axi_wdata;
         vif.axi_wstrb = w_tr.axi_wstrb;
         vif.axi_wlast = w_tr.axi_wlast;
@@ -125,8 +130,78 @@ class axi_driver extends uvm_driver#(axi_transaction);
     
         while(!vif.axi_wready) @(posedge vif.clk);    
         vif.axi_wvalid = 1'b0;
+        
+        @(posedge vif.clk);
     
     endtask : write_data;
+    
+    task write_response(axi_transaction w_tr);
+    
+        vif.axi_bvalid = 1'b1;
+        vif.axi_bid = w_tr.axi_bid;
+        vif.axi_bresp = w_tr.axi_bresp;
+        vif.axi_buser = w_tr.axi_buser;
+    
+        while(!vif.axi_bready) @(posedge vif.clk);    
+        vif.axi_bvalid = 1'b0;
+        
+        @(posedge vif.clk);
+    
+    endtask : write_response;
+    
+    task read_addr(axi_transaction r_tr);
+
+        // send ARVALID
+        vif.axi_arvalid     = 1'b1;
+
+        //wait ARREADY
+        while (!vif.axi_arready) @(posedge vif.clk);
+        
+        r_tr.axi_arid        = vif.axi_arid;
+        r_tr.axi_araddr      = vif.axi_araddr;
+        r_tr.axi_arregion    = vif.axi_arregion;
+        r_tr.axi_arlen       = vif.axi_arlen;
+        r_tr.axi_arsize      = vif.axi_arsize;
+        r_tr.axi_arburst     = vif.axi_arburst;
+        r_tr.axi_arlock      = vif.axi_arlock;
+        r_tr.axi_arcache     = vif.axi_arcache;
+        r_tr.axi_arprot      = vif.axi_arprot;
+        r_tr.axi_arqos       = vif.axi_arqos;
+        
+        @(posedge vif.clk);
+        
+        vif.axi_arvalid = 1'b0;
+        
+        @(posedge vif.clk);
+        
+    endtask : read_addr
+    
+    task read_data(axi_transaction r_tr);
+
+        // send RVALID
+        vif.axi_rvalid     = 1'b1;
+
+        //wait RREADY
+        while (!vif.axi_rready) @(posedge vif.clk);
+        
+        r_tr.axi_rid        = vif.axi_rid;
+        r_tr.axi_rdata      = vif.axi_rdata;
+        r_tr.axi_rlast      = vif.axi_rlast;
+        r_tr.axi_ruser      = vif.axi_ruser;
+        
+        @(posedge vif.clk);
+        
+        vif.axi_rvalid = 1'b0;
+        
+        @(posedge vif.clk);
+        
+    endtask : read_data
+    
+    task read_response(axi_transaction r_tr);
+    
+        r_tr.axi_rresp      = vif.axi_rresp;
+        
+    endtask
 
 endclass : axi_driver
 

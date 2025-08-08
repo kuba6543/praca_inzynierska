@@ -12,8 +12,5 @@
 `include "../axi_if.sv"
 
 typedef enum {
-    AW = 0,
-    W  = 1,
-    AR = 2,
-    B  = 3,
-    R  = 4} transaction_type_t;
+    W = 0,
+    R  = 1} transaction_type_t;

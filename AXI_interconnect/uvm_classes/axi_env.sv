@@ -39,13 +39,14 @@ class axi_env extends uvm_env;
         for(int i = 0; i < M_COUNT; i = i + 1) begin
             axi_agent_master_[i].monitor.axi_analysis_port.connect(predictor.analysis_export);
             axi_agent_master_[i].monitor.axi_analysis_port.connect(coverage_collector.analysis_export);
+            axi_agent_master_[i].monitor.axi_analysis_port.connect(scoreboard.monitor_collected_data);            
         end
         for(int i = 0; i < S_COUNT; i = i + 1) begin
             axi_agent_slave_[i].monitor.axi_analysis_port.connect(predictor.analysis_export);
             axi_agent_slave_[i].monitor.axi_analysis_port.connect(coverage_collector.analysis_export);
+            axi_agent_slave_[i].monitor.axi_analysis_port.connect(scoreboard.monitor_collected_data); 
         end
         predictor.prediction_ap.connect(scoreboard.predictor_collected_data);
-        //coverage_collector.analysis_export.connect(scoreboard.monitor_collected_data);
     endfunction
     
 //    function void report_phase(uvm_phase phase);

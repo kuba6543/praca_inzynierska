@@ -5,6 +5,10 @@ class axi_scoreboard extends uvm_scoreboard;
      `uvm_component_utils(axi_scoreboard)
      uvm_analysis_imp#(axi_transaction, axi_scoreboard) monitor_collected_data;
      uvm_analysis_imp#(axi_transaction, axi_scoreboard) predictor_collected_data;
+     
+     axi_transaction monitor_collected_transaction;
+     axi_transaction predictor_collected_transaction;
+     
      // constructor of scoreboard
      function new (string name, uvm_component parent);
          super.new(name, parent);
@@ -17,13 +21,33 @@ class axi_scoreboard extends uvm_scoreboard;
      endfunction : build_phase
 
      function void write(axi_transaction pkt);
-         $display("AXI Scoreboard: Packet received");
-         if (monitor_collected_data == predictor_collected_data) begin
-             `uvm_info("TEST", "Monitor and predictor collected data is the same", UVM_LOW);
-         end else begin 
-             `uvm_info("TEST", "Monitor and predictor collected data is NOT the same", UVM_MEDIUM);
-         end
-         pkt.print();
+//         $display("AXI Scoreboard: Packet received");
+//         if (monitor_collected_data == predictor_collected_data) begin
+//             `uvm_info("SCB", "Monitor and predictor collected data is the same", UVM_LOW);
+//         end else begin 
+//             `uvm_error("SCB_ERR", "Monitor and predictor collected data is NOT the same");
+//         end
+//         pkt.print();
+    endfunction
+    
+    virtual function void write_monitor_collected_data(axi_transaction t);
+        monitor_collected_transaction = t;
+        compare_if_both_received();
+    endfunction
+
+    virtual function void write_predictor_collected_data(axi_transaction t);
+        predictor_collected_transaction = t;
+        compare_if_both_received();
+    endfunction
+    
+    function void compare_if_both_received();
+        if (predictor_collected_transaction != null && monitor_collected_transaction != null) begin
+            if (predictor_collected_transaction.compare(monitor_collected_transaction)) begin
+                `uvm_info("COMPARE", "Transactions match!", UVM_MEDIUM)
+            end else begin
+                `uvm_error("COMPARE", "Transactions DO NOT match!")
+            end
+        end
     endfunction
 
 //    uvm_analysis_imp#(axi_transaction, axi_scoreboard) master_analysis_export[M_COUNT];
