@@ -11,50 +11,50 @@ class axi_transaction extends uvm_sequence_item;
     rand bit [8-1:0]            axi_awlen;
     rand bit [3-1:0]            axi_awsize;
     rand bit [2-1:0]            axi_awburst;
-    rand bit [1:0]              axi_awlock;
+    rand bit [0:0]              axi_awlock;
     rand bit [4-1:0]            axi_awcache;
     rand bit [3-1:0]            axi_awprot;
     rand bit [4-1:0]            axi_awqos;
     rand bit [3:0]              axi_awregion;
     rand bit [AWUSER_WIDTH-1:0] axi_awuser;
-         bit [1:0]              axi_awvalid;
+         bit [0:0]              axi_awvalid;
     rand bit [DATA_WIDTH-1:0]   axi_wdata;
     rand bit [STRB_WIDTH-1:0]   axi_wstrb;
-    rand bit [1:0]              axi_wlast;
+    rand bit [0:0]              axi_wlast;
     rand bit [WUSER_WIDTH-1:0]  axi_wuser;
-         bit [1:0]              axi_wvalid;
-         bit [1:0]              axi_bready;
+         bit [0:0]              axi_wvalid;
+         bit [0:0]              axi_bready;
     rand bit [ID_WIDTH-1:0]     axi_arid;
     rand bit [ADDR_WIDTH-1:0]   axi_araddr;
     rand bit [8-1:0]            axi_arlen;
     rand bit [3:0]              axi_arregion;
     rand bit [3-1:0]            axi_arsize;
     rand bit [2-1:0]            axi_arburst;
-    rand bit [1:0]              axi_arlock;
+    rand bit [0:0]              axi_arlock;
     rand bit [4-1:0]            axi_arcache;
     rand bit [3-1:0]            axi_arprot;
     rand bit [4-1:0]            axi_arqos;
     rand bit [ARUSER_WIDTH-1:0] axi_aruser;
-         bit [1:0]              axi_arvalid;
-         bit [1:0]              axi_rready;
+         bit [0:0]              axi_arvalid;
+         bit [0:0]              axi_rready;
 
     /*
      * AXI output interfaces
      */
 
-         bit [1:0]              axi_awready;
-         bit [1:0]              axi_wready;
+         bit [0:0]              axi_awready;
+         bit [0:0]              axi_wready;
     rand bit [ID_WIDTH-1:0]     axi_bid;
          bit [2-1:0]            axi_bresp;
     rand bit [BUSER_WIDTH-1:0]  axi_buser;
-         bit [1:0]              axi_bvalid;
-         bit [1:0]              axi_arready;
+         bit [0:0]              axi_bvalid;
+         bit [0:0]              axi_arready;
     rand bit [ID_WIDTH-1:0]     axi_rid;
     rand bit [DATA_WIDTH-1:0]   axi_rdata;
     rand bit [2-1:0]            axi_rresp;
-         bit [1:0]              axi_rlast;
+         bit [0:0]              axi_rlast;
     rand bit [RUSER_WIDTH-1:0]  axi_ruser;
-         bit [1:0]              axi_rvalid;
+         bit [0:0]              axi_rvalid;
 
     `uvm_object_utils_begin(axi_transaction)
         `uvm_field_int(axi_awid, UVM_ALL_ON)

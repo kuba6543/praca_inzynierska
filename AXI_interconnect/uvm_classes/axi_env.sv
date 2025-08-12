@@ -37,12 +37,12 @@ class axi_env extends uvm_env;
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
         for(int i = 0; i < M_COUNT; i = i + 1) begin
-            axi_agent_master_[i].monitor.axi_analysis_port.connect(predictor.analysis_export);
+            axi_agent_master_[i].monitor.axi_analysis_port.connect(predictor.analysis_export_axi_master);
             axi_agent_master_[i].monitor.axi_analysis_port.connect(coverage_collector.analysis_export);
             axi_agent_master_[i].monitor.axi_analysis_port.connect(scoreboard.monitor_collected_data);            
         end
         for(int i = 0; i < S_COUNT; i = i + 1) begin
-            axi_agent_slave_[i].monitor.axi_analysis_port.connect(predictor.analysis_export);
+            axi_agent_slave_[i].monitor.axi_analysis_port.connect(predictor.analysis_export_axi_slave);
             axi_agent_slave_[i].monitor.axi_analysis_port.connect(coverage_collector.analysis_export);
             axi_agent_slave_[i].monitor.axi_analysis_port.connect(scoreboard.monitor_collected_data); 
         end

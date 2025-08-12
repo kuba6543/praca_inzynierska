@@ -20,7 +20,7 @@ class axi_sequence extends uvm_sequence #(axi_transaction);
         wait_for_item_done();
 //        get_response(vif.axi_bresp); 
     
-        #100ns;
+//        #100ns;
     endtask
 
 endclass : axi_sequence

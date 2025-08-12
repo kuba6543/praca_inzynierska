@@ -1,4 +1,4 @@
-parameter CLK               = 10;
+parameter CLK               = 2;
 parameter M_COUNT           = 1;
 parameter S_COUNT           = 1;
 parameter DATA_WIDTH        = 32;

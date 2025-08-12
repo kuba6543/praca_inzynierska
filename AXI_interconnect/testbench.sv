@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+`timescale 1ns / 1ns
 // import UVM components
 `include "uvm_macros.svh"
 import uvm_pkg::*;
@@ -287,7 +287,7 @@ axi_interconnect_inst (
     initial begin
         clk = 0;
         rst = 1;
-        #10 rst = 0;
+        #(3*CLK) rst = 0;
     end
     
     axi_if m_vif[M_COUNT] (clk, rst); // Instantiate physical master interface array

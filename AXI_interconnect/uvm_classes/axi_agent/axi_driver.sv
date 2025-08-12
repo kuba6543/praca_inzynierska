@@ -36,7 +36,6 @@ class axi_driver extends uvm_driver#(axi_transaction);
                 R: begin
    		            read_addr(req);
                     read_data(req);
-                    read_response(req);
                 end
     	        default: `uvm_fatal("axi_driver","No valid command")
             endcase
@@ -122,32 +121,33 @@ class axi_driver extends uvm_driver#(axi_transaction);
     
     task write_data(axi_transaction w_tr);
     
-        vif.axi_wvalid = 1'b1;
-        vif.axi_wdata = w_tr.axi_wdata;
-        vif.axi_wstrb = w_tr.axi_wstrb;
-        vif.axi_wlast = w_tr.axi_wlast;
-        vif.axi_wuser = w_tr.axi_wuser;
-    
-        while(!vif.axi_wready) @(posedge vif.clk);    
-        vif.axi_wvalid = 1'b0;
+        for (int k = 0; k < vif.axi_awlen+1; k=k+1) begin
+            vif.axi_wdata = w_tr.axi_wdata;
+            vif.axi_wstrb = w_tr.axi_wstrb;
+            vif.axi_wlast = (k == vif.axi_awlen);
+            vif.axi_wvalid = 1'b1;
+
+            while (!vif.axi_wready) @(posedge vif.clk);
+            @(posedge vif.clk);
+        end
         
-        @(posedge vif.clk);
+        vif.axi_wvalid = 1'b0;
     
     endtask : write_data;
     
     task write_response(axi_transaction w_tr);
     
-        vif.axi_bvalid = 1'b1;
-        vif.axi_bid = w_tr.axi_bid;
-        vif.axi_bresp = w_tr.axi_bresp;
-        vif.axi_buser = w_tr.axi_buser;
-    
-        while(!vif.axi_bready) @(posedge vif.clk);    
-        vif.axi_bvalid = 1'b0;
+        vif.axi_bvalid  = 1'b1;
+        while(!vif.axi_bready) @(posedge vif.clk);
+        
+        w_tr.axi_bid     = vif.axi_bid;
+        w_tr.axi_bresp   = vif.axi_bresp;
+        w_tr.axi_buser   = vif.axi_buser;    
+        w_tr.axi_bvalid = 1'b0;
         
         @(posedge vif.clk);
     
-    endtask : write_response;
+    endtask : write_response
     
     task read_addr(axi_transaction r_tr);
 
@@ -177,31 +177,21 @@ class axi_driver extends uvm_driver#(axi_transaction);
     endtask : read_addr
     
     task read_data(axi_transaction r_tr);
+        for (int l = 0; l < vif.axi_arlen+1; l=l+1) begin
+            r_tr.axi_rdata    = vif.axi_rdata;
+            r_tr.axi_ruser    = vif.axi_ruser;
+            r_tr.axi_rlast    = (l == vif.axi_arlen);
+            r_tr.axi_rresp    = vif.axi_rresp;
+            vif.axi_rvalid    = 1'b1;
 
-        // send RVALID
-        vif.axi_rvalid     = 1'b1;
+            while (!vif.axi_rready) @(posedge vif.clk);
+            @(posedge vif.clk);
+        end
 
-        //wait RREADY
-        while (!vif.axi_rready) @(posedge vif.clk);
-        
-        r_tr.axi_rid        = vif.axi_rid;
-        r_tr.axi_rdata      = vif.axi_rdata;
-        r_tr.axi_rlast      = vif.axi_rlast;
-        r_tr.axi_ruser      = vif.axi_ruser;
-        
-        @(posedge vif.clk);
-        
         vif.axi_rvalid = 1'b0;
-        
         @(posedge vif.clk);
         
     endtask : read_data
     
-    task read_response(axi_transaction r_tr);
-    
-        r_tr.axi_rresp      = vif.axi_rresp;
-        
-    endtask
-
 endclass : axi_driver
 
