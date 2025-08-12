@@ -50,7 +50,6 @@ class axi_predictor extends uvm_component;
                 phase.drop_objection(this);
                 objection_raised = 0;
             end
-            
         end
     endtask : run_phase
 

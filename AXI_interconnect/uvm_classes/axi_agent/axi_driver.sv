@@ -132,18 +132,20 @@ class axi_driver extends uvm_driver#(axi_transaction);
         end
         
         vif.axi_wvalid = 1'b0;
-    
+        vif.axi_wlast = 1'b0;
+        vif.axi_wdata = 1'b0;
+        vif.axi_wstrb = 1'b0;
     endtask : write_data;
     
     task write_response(axi_transaction w_tr);
     
-        vif.axi_bvalid  = 1'b1;
-        while(!vif.axi_bready) @(posedge vif.clk);
+        vif.axi_bready  = 1'b1;
+        while(!vif.axi_bvalid) @(posedge vif.clk);
         
         w_tr.axi_bid     = vif.axi_bid;
         w_tr.axi_bresp   = vif.axi_bresp;
         w_tr.axi_buser   = vif.axi_buser;    
-        w_tr.axi_bvalid = 1'b0;
+        vif.axi_bready = 1'b0;
         
         @(posedge vif.clk);
     
@@ -189,6 +191,9 @@ class axi_driver extends uvm_driver#(axi_transaction);
         end
 
         vif.axi_rvalid = 1'b0;
+        vif.axi_rdata = 1'b0;
+        vif.axi_ruser = 1'b0;
+        vif.axi_rlast = 1'b0;
         @(posedge vif.clk);
         
     endtask : read_data
