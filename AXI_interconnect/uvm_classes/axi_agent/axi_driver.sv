@@ -4,7 +4,7 @@ class axi_driver extends uvm_driver#(axi_transaction);
 
     virtual interface axi_if vif;
     axi_sequence seq;
-    bit is_slave = 0;
+    bit is_slave;
 
     `uvm_component_utils(axi_driver)
 
@@ -27,19 +27,17 @@ class axi_driver extends uvm_driver#(axi_transaction);
         forever begin
             seq_item_port.get_next_item(req);
             @(posedge vif.clk);
-            case(req.transaction_type)
-                W: begin
-                    write_addr(req);
-                    write_data(req);
-                    write_response(req);
-                end
-                R: begin
-   		            read_addr(req);
-                    read_data(req);
-                end
-    	        default: `uvm_fatal("axi_driver","No valid command")
+//            `uvm_info("DRV", $sformatf("Is slave? = %d", is_slave),UVM_LOW)
+            case(is_slave)
+            0: begin
+                drive_master(req);
+            end
+            1: begin
+                drive_slave(req);
+            end
+            default: `uvm_fatal("axi_driver","Not possible to determine type of agent")
             endcase
-            `uvm_info("DRV", $sformatf("Driving transaction:\n%s", req.sprint()), UVM_MEDIUM)
+            `uvm_info("DRV", $sformatf("Driving slave transaction:\n%s", req.sprint()), UVM_MEDIUM)
             seq_item_port.item_done();
         end
     endtask : run_phase
@@ -91,10 +89,38 @@ class axi_driver extends uvm_driver#(axi_transaction);
         vif.axi_rvalid  = 0;
         vif.axi_rready  = 0;
     endtask: reset
+    
+    task drive_slave(axi_transaction req);
+        case(req.transaction_type)
+            W: begin
+                write_addr_s(req);
+                write_data_s(req);
+                write_response_s(req);
+            end
+            R: begin
+   		         read_addr_s(req);
+                 read_data_s(req);
+            end
+    	    default: `uvm_fatal("axi_driver_slave","No valid command")
+        endcase
+    endtask
+    
+    task drive_master(axi_transaction req);
+        case(req.transaction_type)
+            W: begin
+                write_addr_m(req);
+                write_data_m(req);
+                write_response_m(req);
+            end
+            R: begin
+   		         read_addr_m(req);
+                 read_data_m(req);
+            end
+    	    default: `uvm_fatal("axi_driver_master","No valid command")
+        endcase
+    endtask
 
-    task write_addr(axi_transaction w_tr);
-//        axi_transaction w_tr;
-
+    task write_addr_s(axi_transaction w_tr);
         // send transaction
         vif.axi_awvalid     = 1'b1;
         vif.axi_awid        = w_tr.axi_awid;
@@ -113,13 +139,10 @@ class axi_driver extends uvm_driver#(axi_transaction);
         vif.axi_awvalid = 1'b0;
         
         @(posedge vif.clk);
-        
-//        `uvm_info("DRV", $sformatf("Driving transaction:\n%s", req.sprint()), UVM_MEDIUM)
-//        seq_item_port.item_done();
 
-    endtask : write_addr
+    endtask : write_addr_s
     
-    task write_data(axi_transaction w_tr);
+    task write_data_s(axi_transaction w_tr);
     
         for (int k = 0; k < vif.axi_awlen+1; k=k+1) begin
             vif.axi_wdata = w_tr.axi_wdata;
@@ -135,9 +158,9 @@ class axi_driver extends uvm_driver#(axi_transaction);
         vif.axi_wlast = 1'b0;
         vif.axi_wdata = 1'b0;
         vif.axi_wstrb = 1'b0;
-    endtask : write_data;
+    endtask : write_data_s;
     
-    task write_response(axi_transaction w_tr);
+    task write_response_s(axi_transaction w_tr);
     
         vif.axi_bready  = 1'b1;
         while(!vif.axi_bvalid) @(posedge vif.clk);
@@ -149,26 +172,29 @@ class axi_driver extends uvm_driver#(axi_transaction);
         
         @(posedge vif.clk);
     
-    endtask : write_response
+    endtask : write_response_s
     
-    task read_addr(axi_transaction r_tr);
+    task read_addr_s(axi_transaction r_tr);
+    
+        @(posedge vif.clk);
 
-        // send ARVALID
-        vif.axi_arvalid     = 1'b1;
-
-        //wait ARREADY
-        while (!vif.axi_arready) @(posedge vif.clk);
+        vif.axi_arid        = r_tr.axi_arid;
+        vif.axi_araddr      = r_tr.axi_araddr;
+        vif.axi_arregion    = r_tr.axi_arregion;
+        vif.axi_arlen       = r_tr.axi_arlen;
+        vif.axi_arsize      = r_tr.axi_arsize;
+        vif.axi_arburst     = r_tr.axi_arburst;
+        vif.axi_arlock      = r_tr.axi_arlock;
+        vif.axi_arcache     = r_tr.axi_arcache;
+        vif.axi_arprot      = r_tr.axi_arprot;
+        vif.axi_arqos       = r_tr.axi_arqos;
+        vif.axi_aruser      = r_tr.axi_aruser;
         
-        r_tr.axi_arid        = vif.axi_arid;
-        r_tr.axi_araddr      = vif.axi_araddr;
-        r_tr.axi_arregion    = vif.axi_arregion;
-        r_tr.axi_arlen       = vif.axi_arlen;
-        r_tr.axi_arsize      = vif.axi_arsize;
-        r_tr.axi_arburst     = vif.axi_arburst;
-        r_tr.axi_arlock      = vif.axi_arlock;
-        r_tr.axi_arcache     = vif.axi_arcache;
-        r_tr.axi_arprot      = vif.axi_arprot;
-        r_tr.axi_arqos       = vif.axi_arqos;
+        @(posedge vif.clk);
+        // send ARVALID        
+        vif.axi_arvalid     = 1'b1;
+        // wait ARREADY
+        while (!vif.axi_arready) @(posedge vif.clk);
         
         @(posedge vif.clk);
         
@@ -176,17 +202,123 @@ class axi_driver extends uvm_driver#(axi_transaction);
         
         @(posedge vif.clk);
         
-    endtask : read_addr
+    endtask : read_addr_s
     
-    task read_data(axi_transaction r_tr);
+    task read_data_s(axi_transaction r_tr);
+        vif.axi_rready = 1'b1;
+        while (!vif.axi_rvalid) @(posedge vif.clk);
         for (int l = 0; l < vif.axi_arlen+1; l=l+1) begin
-            r_tr.axi_rdata    = vif.axi_rdata;
-            r_tr.axi_ruser    = vif.axi_ruser;
-            r_tr.axi_rlast    = (l == vif.axi_arlen);
-            r_tr.axi_rresp    = vif.axi_rresp;
+            vif.axi_rdata    = r_tr.axi_rdata;
+            vif.axi_ruser    = r_tr.axi_ruser;
+            vif.axi_rlast    = (l == r_tr.axi_arlen);
+            vif.axi_rresp    = r_tr.axi_rresp;
             vif.axi_rvalid    = 1'b1;
 
-            while (!vif.axi_rready) @(posedge vif.clk);
+
+            @(posedge vif.clk);
+        end
+
+        vif.axi_rready = 1'b0;
+        vif.axi_rdata = 1'b0;
+        vif.axi_ruser = 1'b0;
+        vif.axi_rlast = 1'b0;
+        @(posedge vif.clk);
+        
+    endtask : read_data_s
+       
+    task write_addr_m(axi_transaction w_tr);
+        // send transaction
+        vif.axi_awid        = w_tr.axi_awid;
+        vif.axi_awaddr      = w_tr.axi_awaddr;
+        vif.axi_awregion    = w_tr.axi_awregion;
+        vif.axi_awlen       = w_tr.axi_awlen;
+        vif.axi_awsize      = w_tr.axi_awsize;
+        vif.axi_awburst     = w_tr.axi_awburst;
+        vif.axi_awlock      = w_tr.axi_awlock;
+        vif.axi_awcache     = w_tr.axi_awcache;
+        vif.axi_awprot      = w_tr.axi_awprot;
+        vif.axi_awqos       = w_tr.axi_awqos;
+        
+        vif.axi_awready     = 1'b1;
+
+        while (!vif.axi_awvalid) @(posedge vif.clk);
+        vif.axi_awready = 1'b0;
+        
+        @(posedge vif.clk);
+
+    endtask : write_addr_m
+    
+    task write_data_m(axi_transaction w_tr);
+    
+        for (int k = 0; k < vif.axi_awlen+1; k=k+1) begin
+            vif.axi_wdata = w_tr.axi_wdata;
+            vif.axi_wstrb = w_tr.axi_wstrb;
+            vif.axi_wlast = (k == vif.axi_awlen);
+            vif.axi_wready = 1'b1;
+
+            while (!vif.axi_wvalid) @(posedge vif.clk);
+            @(posedge vif.clk);
+        end
+        
+        vif.axi_wready = 1'b0;
+        vif.axi_wlast = 1'b0;
+        vif.axi_wdata = 1'b0;
+        vif.axi_wstrb = 1'b0;
+    endtask : write_data_m;
+    
+    task write_response_m(axi_transaction w_tr);
+    
+        vif.axi_bvalid  = 1'b1;
+        while(!vif.axi_bready) @(posedge vif.clk);
+        
+        w_tr.axi_bid     = vif.axi_bid;
+        w_tr.axi_bresp   = vif.axi_bresp;
+        w_tr.axi_buser   = vif.axi_buser;    
+        vif.axi_bvalid = 1'b0;
+        
+        @(posedge vif.clk);
+    
+    endtask : write_response_m
+    
+    task read_addr_m(axi_transaction r_tr);
+    
+        @(posedge vif.clk);
+
+        vif.axi_arid        = r_tr.axi_arid;
+        vif.axi_araddr      = r_tr.axi_araddr;
+        vif.axi_arregion    = r_tr.axi_arregion;
+        vif.axi_arlen       = r_tr.axi_arlen;
+        vif.axi_arsize      = r_tr.axi_arsize;
+        vif.axi_arburst     = r_tr.axi_arburst;
+        vif.axi_arlock      = r_tr.axi_arlock;
+        vif.axi_arcache     = r_tr.axi_arcache;
+        vif.axi_arprot      = r_tr.axi_arprot;
+        vif.axi_arqos       = r_tr.axi_arqos;
+        vif.axi_aruser      = r_tr.axi_aruser;
+        
+        @(posedge vif.clk);
+        
+        vif.axi_arready     = 1'b1;
+
+        while (!vif.axi_arvalid) @(posedge vif.clk);
+        
+        @(posedge vif.clk);
+        
+        vif.axi_arready = 1'b0;
+        
+        @(posedge vif.clk);
+        
+    endtask : read_addr_m
+    
+    task read_data_m(axi_transaction r_tr);
+        vif.axi_rvalid = 1'b1;
+        while (!vif.axi_rready) @(posedge vif.clk);
+        for (int l = 0; l < vif.axi_arlen+1; l=l+1) begin
+            vif.axi_rdata    = r_tr.axi_rdata;
+            vif.axi_ruser    = r_tr.axi_ruser;
+            vif.axi_rlast    = (l == r_tr.axi_arlen);
+            vif.axi_rresp    = r_tr.axi_rresp;
+
             @(posedge vif.clk);
         end
 
@@ -196,7 +328,7 @@ class axi_driver extends uvm_driver#(axi_transaction);
         vif.axi_rlast = 1'b0;
         @(posedge vif.clk);
         
-    endtask : read_data
+    endtask : read_data_m
     
 endclass : axi_driver
 

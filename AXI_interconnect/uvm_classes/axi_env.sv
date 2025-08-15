@@ -8,7 +8,6 @@ class axi_env extends uvm_env;
     
     axi_predictor predictor;
     axi_coverage_collector coverage_collector;
-    
     axi_scoreboard scoreboard;
   
     `uvm_component_utils(axi_env)
@@ -48,10 +47,5 @@ class axi_env extends uvm_env;
         end
         predictor.prediction_ap.connect(scoreboard.predictor_collected_data);
     endfunction
-    
-//    function void report_phase(uvm_phase phase);
-//        super.report_phase(phase);
-//        `uvm_info(get_full_name(), phase.get_name(), UVM_MEDIUM)
-//    endfunction : report_phase
 
 endclass : axi_env

@@ -5,7 +5,7 @@ class axi_agent extends uvm_agent;
     axi_monitor   monitor;
 
 	// hold parameter if the agent is slave
-    bit is_slave = 0;
+    bit is_slave;
 
   	// UVM automation macros for general components
     `uvm_component_utils(axi_agent)
@@ -23,6 +23,7 @@ class axi_agent extends uvm_agent;
             sequencer = axi_sequencer::type_id::create("sequencer", this);
         end
         monitor = axi_monitor::type_id::create("monitor", this);
+        uvm_config_db#(bit)::set(this, "driver", "is_slave", is_slave);
     endfunction : build_phase
 
   	// connect driver with sequencer if the agent is active
@@ -30,6 +31,7 @@ class axi_agent extends uvm_agent;
         if(get_is_active() == UVM_ACTIVE) begin
         driver.seq_item_port.connect(sequencer.seq_item_export);
     end
+    driver.is_slave = this.is_slave;
     endfunction : connect_phase
 
 endclass : axi_agent

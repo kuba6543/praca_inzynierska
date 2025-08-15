@@ -44,19 +44,20 @@ class axi_transaction extends uvm_sequence_item;
 
          bit [0:0]              axi_awready;
          bit [0:0]              axi_wready;
-    rand bit [ID_WIDTH-1:0]     axi_bid;
-         bit [2-1:0]            axi_bresp;
-    rand bit [BUSER_WIDTH-1:0]  axi_buser;
+         bit [ID_WIDTH-1:0]     axi_bid;
+         bit [3-1:0]            axi_bresp;
+         bit [BUSER_WIDTH-1:0]  axi_buser;
          bit [0:0]              axi_bvalid;
          bit [0:0]              axi_arready;
-    rand bit [ID_WIDTH-1:0]     axi_rid;
+         bit [ID_WIDTH-1:0]     axi_rid;
     rand bit [DATA_WIDTH-1:0]   axi_rdata;
-    rand bit [2-1:0]            axi_rresp;
+         bit [3-1:0]            axi_rresp;
          bit [0:0]              axi_rlast;
-    rand bit [RUSER_WIDTH-1:0]  axi_ruser;
+         bit [RUSER_WIDTH-1:0]  axi_ruser;
          bit [0:0]              axi_rvalid;
 
     `uvm_object_utils_begin(axi_transaction)
+        `uvm_field_int(transaction_type, UVM_ALL_ON)
         `uvm_field_int(axi_awid, UVM_ALL_ON)
         `uvm_field_int(axi_awaddr, UVM_ALL_ON)
         `uvm_field_int(axi_awlen, UVM_ALL_ON)
@@ -86,6 +87,19 @@ class axi_transaction extends uvm_sequence_item;
         `uvm_field_int(axi_aruser, UVM_ALL_ON)
         `uvm_field_int(axi_arvalid, UVM_ALL_ON)
         `uvm_field_int(axi_rready, UVM_ALL_ON)
+        `uvm_field_int(axi_awready, UVM_ALL_ON)
+        `uvm_field_int(axi_wready,  UVM_ALL_ON)
+        `uvm_field_int(axi_bid,     UVM_ALL_ON)
+        `uvm_field_int(axi_bresp,   UVM_ALL_ON)
+        `uvm_field_int(axi_buser,   UVM_ALL_ON)
+        `uvm_field_int(axi_bvalid,  UVM_ALL_ON)
+        `uvm_field_int(axi_arready, UVM_ALL_ON)
+        `uvm_field_int(axi_rid,     UVM_ALL_ON)
+        `uvm_field_int(axi_rdata,   UVM_ALL_ON)
+        `uvm_field_int(axi_rresp,   UVM_ALL_ON)
+        `uvm_field_int(axi_rlast,   UVM_ALL_ON)
+        `uvm_field_int(axi_ruser,   UVM_ALL_ON)
+        `uvm_field_int(axi_rvalid,  UVM_ALL_ON)
     `uvm_object_utils_end
 
     function new  (string name = "axi_transaction");
@@ -97,10 +111,10 @@ class axi_transaction extends uvm_sequence_item;
             axi_arburst != 2'b11;
     };
 
-    constraint AxLOCK_RESERVED {
-            axi_awlock != 2'b11;
-            axi_arlock != 2'b11;
-    };
+//    constraint AxLOCK_RESERVED {
+//            axi_awlock != 2'b11;
+//            axi_arlock != 2'b11;
+//    };
     constraint BRESP_RESERVED {
             axi_bresp != 3'b110;
     };

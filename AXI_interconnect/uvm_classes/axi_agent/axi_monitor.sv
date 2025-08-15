@@ -19,7 +19,7 @@ class axi_monitor extends uvm_monitor;
         super.build_phase(phase);
         if(!uvm_config_db#(virtual axi_if)::get(this, "", "vif", vif))   
             `uvm_fatal(get_full_name(),"No virtual interface specified for this instance");
-        trans_collected = axi_transaction::type_id::create("trans_collected");
+//        trans_collected = axi_transaction::type_id::create("trans_collected");
     endfunction: build_phase
 
     virtual task run_phase(uvm_phase phase);
@@ -58,6 +58,7 @@ class axi_monitor extends uvm_monitor;
                 `uvm_info("MON", $sformatf("Sampled B transaction:\n%s", trans_collected.sprint()), UVM_MEDIUM)
             end
             if (vif.axi_arvalid && vif.axi_arready && !vif.rst) begin
+                @(posedge vif.clk);
                 trans_collected = axi_transaction::type_id::create("ar_trans");                                                            
                 trans_collected.axi_arid    = vif.axi_arid;
                 trans_collected.axi_araddr  = vif.axi_araddr;
@@ -73,6 +74,7 @@ class axi_monitor extends uvm_monitor;
                 `uvm_info("MON", $sformatf("Sampled AR transaction:\n%s", trans_collected.sprint()), UVM_MEDIUM)                                
             end
             if (vif.axi_rvalid && vif.axi_rready && !vif.rst) begin
+                @(posedge vif.clk);            
                 trans_collected = axi_transaction::type_id::create("r_trans"); 
                 trans_collected.axi_rid     = vif.axi_rid;
                 trans_collected.axi_rdata   = vif.axi_rdata;
