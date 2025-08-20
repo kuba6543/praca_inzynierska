@@ -1,28 +1,27 @@
 class axi_sequence extends uvm_sequence #(axi_transaction);
 
-    `uvm_object_utils(axi_sequence)
-    
-    virtual axi_if vif;
+  rand axi_transaction::transaction_type_e transaction_type_to_generate;
+  rand int unsigned length; // np. d³ugoœæ burstu
 
-    function new(string name = "axi_sequence");
-        super.new(name);
-    endfunction
+  `uvm_object_utils(axi_sequence)
 
-    virtual task body();
-        axi_transaction transaction;
+  function new(string name="axi_sequence");
+    super.new(name);
+  endfunction
 
-        repeat(10) begin
-            transaction = axi_transaction::type_id::create("transaction");
-            start_item(transaction);
-            if (!transaction.randomize()) begin
-                `uvm_error("SEQ", "Randomization failed!")
-            end
-            `uvm_info("SEQ", $sformatf("Generated transaction:\n%s", transaction.sprint()), UVM_MEDIUM)
-//            wait_for_grant();
-//            send_request(transaction);
-//            wait_for_item_done();
-            finish_item(transaction);
-        end
-    endtask
+  task body();
+    axi_transaction tr;
+
+    tr = axi_transaction::type_id::create("tr");
+    assert(tr.randomize() with {
+      if (transaction_type_to_generate == axi_transaction::W) axi_awlen <= length;
+      if (transaction_type_to_generate == axi_transaction::R) axi_arlen <= length;
+    });
+
+    `uvm_info("SEQ", $sformatf("Generated transaction:\n%s", tr.sprint()), UVM_LOW)
+
+    start_item(tr);
+    finish_item(tr);
+  endtask
 
 endclass : axi_sequence

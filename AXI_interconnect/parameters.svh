@@ -22,3 +22,14 @@ parameter M_ADDR_WIDTH      = {M_COUNT{{M_REGIONS{32'd24}}}};
 parameter M_CONNECT_READ    = {M_COUNT{{S_COUNT{1'b1}}}};
 parameter M_CONNECT_WRITE   = {M_COUNT{{S_COUNT{1'b1}}}};
 parameter M_SECURE          = {M_COUNT{1'b0}};
+
+typedef enum {
+    Wr = 0,
+    Re = 1} transaction_type_t;
+    
+typedef enum { 
+    AW = 0,
+    W = 1,
+    B = 2,
+    AR = 3,
+    R = 4} transaction_type_e;

@@ -22,11 +22,11 @@ class axi_env extends uvm_env;
         super.build_phase(phase);
         for(int i = 0; i < M_COUNT; i = i + 1) begin
             axi_agent_master_[i] = axi_agent::type_id::create($sformatf("axi_agent_master_%0d", i), this);
-            axi_agent_master_[i].is_slave = 0;
+            axi_agent_master_[i].is_master = 0;
         end
         for(int i = 0; i < S_COUNT; i = i + 1) begin
             axi_agent_slave_[i] = axi_agent::type_id::create($sformatf("axi_agent_slave_%0d", i), this);
-            axi_agent_slave_[i].is_slave = 1;
+            axi_agent_slave_[i].is_master = 1;
         end
         scoreboard = axi_scoreboard::type_id::create("axi_scoreboard", this);
         predictor = axi_predictor::type_id::create("axi_predictor", this);
@@ -36,12 +36,14 @@ class axi_env extends uvm_env;
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
         for(int i = 0; i < M_COUNT; i = i + 1) begin
+            uvm_config_db#(axi_sequencer)::set(this, "predictor", "m_sequencer", axi_agent_master_[i].sequencer);
             axi_agent_master_[i].monitor.axi_analysis_port.connect(predictor.analysis_export_axi_master);
             axi_agent_master_[i].monitor.axi_analysis_port.connect(coverage_collector.analysis_export);
             axi_agent_master_[i].monitor.axi_analysis_port.connect(scoreboard.monitor_collected_data);            
         end
         for(int i = 0; i < S_COUNT; i = i + 1) begin
             axi_agent_slave_[i].monitor.axi_analysis_port.connect(predictor.analysis_export_axi_slave);
+            axi_agent_slave_[i].monitor.axi_analysis_port.connect(predictor.analysis_export);
             axi_agent_slave_[i].monitor.axi_analysis_port.connect(coverage_collector.analysis_export);
             axi_agent_slave_[i].monitor.axi_analysis_port.connect(scoreboard.monitor_collected_data); 
         end

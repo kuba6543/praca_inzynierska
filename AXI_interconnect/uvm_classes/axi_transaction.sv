@@ -1,6 +1,9 @@
 class axi_transaction extends uvm_sequence_item;
+
+    `include "../parameters.svh"
     
-    rand transaction_type_t transaction_type;
+    rand transaction_type_t trans_type_t;
+    rand transaction_type_e trans_type_e;
 
     /*
      * AXI input interfaces
@@ -17,13 +20,10 @@ class axi_transaction extends uvm_sequence_item;
     rand bit [4-1:0]            axi_awqos;
     rand bit [3:0]              axi_awregion;
     rand bit [AWUSER_WIDTH-1:0] axi_awuser;
-         bit [0:0]              axi_awvalid;
     rand bit [DATA_WIDTH-1:0]   axi_wdata;
     rand bit [STRB_WIDTH-1:0]   axi_wstrb;
     rand bit [0:0]              axi_wlast;
     rand bit [WUSER_WIDTH-1:0]  axi_wuser;
-         bit [0:0]              axi_wvalid;
-         bit [0:0]              axi_bready;
     rand bit [ID_WIDTH-1:0]     axi_arid;
     rand bit [ADDR_WIDTH-1:0]   axi_araddr;
     rand bit [8-1:0]            axi_arlen;
@@ -35,29 +35,22 @@ class axi_transaction extends uvm_sequence_item;
     rand bit [3-1:0]            axi_arprot;
     rand bit [4-1:0]            axi_arqos;
     rand bit [ARUSER_WIDTH-1:0] axi_aruser;
-         bit [0:0]              axi_arvalid;
-         bit [0:0]              axi_rready;
 
     /*
      * AXI output interfaces
      */
 
-         bit [0:0]              axi_awready;
-         bit [0:0]              axi_wready;
          bit [ID_WIDTH-1:0]     axi_bid;
          bit [3-1:0]            axi_bresp;
          bit [BUSER_WIDTH-1:0]  axi_buser;
-         bit [0:0]              axi_bvalid;
-         bit [0:0]              axi_arready;
          bit [ID_WIDTH-1:0]     axi_rid;
-    rand bit [DATA_WIDTH-1:0]   axi_rdata;
+         bit [DATA_WIDTH-1:0]   axi_rdata;
          bit [3-1:0]            axi_rresp;
          bit [0:0]              axi_rlast;
          bit [RUSER_WIDTH-1:0]  axi_ruser;
-         bit [0:0]              axi_rvalid;
 
     `uvm_object_utils_begin(axi_transaction)
-        `uvm_field_int(transaction_type, UVM_ALL_ON)
+        `uvm_field_int(trans_type_e, UVM_ALL_ON)
         `uvm_field_int(axi_awid, UVM_ALL_ON)
         `uvm_field_int(axi_awaddr, UVM_ALL_ON)
         `uvm_field_int(axi_awlen, UVM_ALL_ON)
@@ -68,13 +61,10 @@ class axi_transaction extends uvm_sequence_item;
         `uvm_field_int(axi_awprot, UVM_ALL_ON)
         `uvm_field_int(axi_awqos, UVM_ALL_ON)
         `uvm_field_int(axi_awuser, UVM_ALL_ON)
-        `uvm_field_int(axi_awvalid, UVM_ALL_ON)
         `uvm_field_int(axi_wdata, UVM_ALL_ON)
         `uvm_field_int(axi_wstrb, UVM_ALL_ON)
         `uvm_field_int(axi_wlast, UVM_ALL_ON)
         `uvm_field_int(axi_wuser, UVM_ALL_ON)
-        `uvm_field_int(axi_wvalid, UVM_ALL_ON)
-        `uvm_field_int(axi_bready, UVM_ALL_ON)
         `uvm_field_int(axi_arid, UVM_ALL_ON)
         `uvm_field_int(axi_araddr, UVM_ALL_ON)
         `uvm_field_int(axi_arlen, UVM_ALL_ON)
@@ -85,21 +75,14 @@ class axi_transaction extends uvm_sequence_item;
         `uvm_field_int(axi_arprot, UVM_ALL_ON)
         `uvm_field_int(axi_arqos, UVM_ALL_ON)
         `uvm_field_int(axi_aruser, UVM_ALL_ON)
-        `uvm_field_int(axi_arvalid, UVM_ALL_ON)
-        `uvm_field_int(axi_rready, UVM_ALL_ON)
-        `uvm_field_int(axi_awready, UVM_ALL_ON)
-        `uvm_field_int(axi_wready,  UVM_ALL_ON)
-        `uvm_field_int(axi_bid,     UVM_ALL_ON)
-        `uvm_field_int(axi_bresp,   UVM_ALL_ON)
-        `uvm_field_int(axi_buser,   UVM_ALL_ON)
-        `uvm_field_int(axi_bvalid,  UVM_ALL_ON)
-        `uvm_field_int(axi_arready, UVM_ALL_ON)
-        `uvm_field_int(axi_rid,     UVM_ALL_ON)
-        `uvm_field_int(axi_rdata,   UVM_ALL_ON)
-        `uvm_field_int(axi_rresp,   UVM_ALL_ON)
-        `uvm_field_int(axi_rlast,   UVM_ALL_ON)
-        `uvm_field_int(axi_ruser,   UVM_ALL_ON)
-        `uvm_field_int(axi_rvalid,  UVM_ALL_ON)
+        `uvm_field_int(axi_bid, UVM_ALL_ON)
+        `uvm_field_int(axi_bresp, UVM_ALL_ON)
+        `uvm_field_int(axi_buser, UVM_ALL_ON)
+        `uvm_field_int(axi_rid, UVM_ALL_ON)
+        `uvm_field_int(axi_rdata, UVM_ALL_ON)
+        `uvm_field_int(axi_rresp, UVM_ALL_ON)
+        `uvm_field_int(axi_rlast, UVM_ALL_ON)
+        `uvm_field_int(axi_ruser, UVM_ALL_ON)
     `uvm_object_utils_end
 
     function new  (string name = "axi_transaction");
@@ -111,10 +94,6 @@ class axi_transaction extends uvm_sequence_item;
             axi_arburst != 2'b11;
     };
 
-//    constraint AxLOCK_RESERVED {
-//            axi_awlock != 2'b11;
-//            axi_arlock != 2'b11;
-//    };
     constraint BRESP_RESERVED {
             axi_bresp != 3'b110;
     };

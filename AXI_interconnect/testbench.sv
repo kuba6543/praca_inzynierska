@@ -311,7 +311,7 @@ axi_interconnect_inst (
             assign m_vif[i].axi_awregion                                    = m_axi_awregion[i*4 +: 4];
             assign m_vif[i].axi_awuser                                      = m_axi_awuser[i*AWUSER_WIDTH +: AWUSER_WIDTH];
             assign m_vif[i].axi_awvalid                                     = m_axi_awvalid[i];
-            assign m_axi_awready[i]                                         = m_vif[i].axi_awready;
+            assign m_axi_awready[i]                                         = m_vif[i].axi_awready;        
 
             assign m_vif[i].axi_wdata                                       = m_axi_wdata[i*DATA_WIDTH +: DATA_WIDTH];
             assign m_vif[i].axi_wstrb                                       = m_axi_wstrb[i*STRB_WIDTH +: STRB_WIDTH];

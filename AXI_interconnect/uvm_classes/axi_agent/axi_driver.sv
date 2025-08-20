@@ -4,7 +4,7 @@ class axi_driver extends uvm_driver#(axi_transaction);
 
     virtual interface axi_if vif;
     axi_sequence seq;
-    bit is_slave;
+    bit is_master;
 
     `uvm_component_utils(axi_driver)
 
@@ -17,6 +17,9 @@ class axi_driver extends uvm_driver#(axi_transaction);
         super.connect_phase(phase);
         if (!uvm_config_db#(virtual axi_if)::get(this, "", "vif", vif))
             `uvm_fatal(get_full_name(),"No virtual interface specified for this instance");
+        `uvm_info("DRV", $sformatf("is_master=%0d", is_master), UVM_LOW)
+        if (!uvm_config_db#(bit)::get(this, "", "is_master", is_master))
+            `uvm_fatal(get_full_name(),"No is_master flag specified for this instance");
     endfunction : connect_phase
 
     // UVM run_phase
@@ -27,8 +30,8 @@ class axi_driver extends uvm_driver#(axi_transaction);
         forever begin
             seq_item_port.get_next_item(req);
             @(posedge vif.clk);
-//            `uvm_info("DRV", $sformatf("Is slave? = %d", is_slave),UVM_LOW)
-            case(is_slave)
+//            `uvm_info("DRV", $sformatf("Is slave? = %d", is_master),UVM_LOW)
+            case(is_master)
             0: begin
                 drive_master(req);
             end
@@ -37,7 +40,7 @@ class axi_driver extends uvm_driver#(axi_transaction);
             end
             default: `uvm_fatal("axi_driver","Not possible to determine type of agent")
             endcase
-            `uvm_info("DRV", $sformatf("Driving slave transaction:\n%s", req.sprint()), UVM_MEDIUM)
+            `uvm_info("DRV", $sformatf("Driving transaction:\n%s", req.sprint()), UVM_MEDIUM)
             seq_item_port.item_done();
         end
     endtask : run_phase
@@ -91,13 +94,13 @@ class axi_driver extends uvm_driver#(axi_transaction);
     endtask: reset
     
     task drive_slave(axi_transaction req);
-        case(req.transaction_type)
-            W: begin
+        case(req.trans_type_t)
+            Wr: begin
                 write_addr_s(req);
                 write_data_s(req);
                 write_response_s(req);
             end
-            R: begin
+            Re: begin
    		         read_addr_s(req);
                  read_data_s(req);
             end
@@ -106,13 +109,13 @@ class axi_driver extends uvm_driver#(axi_transaction);
     endtask
     
     task drive_master(axi_transaction req);
-        case(req.transaction_type)
-            W: begin
+        case(req.trans_type_t)
+            Wr: begin
                 write_addr_m(req);
                 write_data_m(req);
                 write_response_m(req);
             end
-            R: begin
+            Re: begin
    		         read_addr_m(req);
                  read_data_m(req);
             end
@@ -227,7 +230,11 @@ class axi_driver extends uvm_driver#(axi_transaction);
     endtask : read_data_s
        
     task write_addr_m(axi_transaction w_tr);
+        
+        vif.axi_awready     = 1'b1;
         // send transaction
+        while (!vif.axi_awvalid) @(posedge vif.clk);
+        
         vif.axi_awid        = w_tr.axi_awid;
         vif.axi_awaddr      = w_tr.axi_awaddr;
         vif.axi_awregion    = w_tr.axi_awregion;
@@ -239,9 +246,8 @@ class axi_driver extends uvm_driver#(axi_transaction);
         vif.axi_awprot      = w_tr.axi_awprot;
         vif.axi_awqos       = w_tr.axi_awqos;
         
-        vif.axi_awready     = 1'b1;
+        @(posedge vif.clk)
 
-        while (!vif.axi_awvalid) @(posedge vif.clk);
         vif.axi_awready = 1'b0;
         
         @(posedge vif.clk);
@@ -282,8 +288,6 @@ class axi_driver extends uvm_driver#(axi_transaction);
     
     task read_addr_m(axi_transaction r_tr);
     
-        @(posedge vif.clk);
-
         vif.axi_arid        = r_tr.axi_arid;
         vif.axi_araddr      = r_tr.axi_araddr;
         vif.axi_arregion    = r_tr.axi_arregion;
@@ -296,10 +300,10 @@ class axi_driver extends uvm_driver#(axi_transaction);
         vif.axi_arqos       = r_tr.axi_arqos;
         vif.axi_aruser      = r_tr.axi_aruser;
         
-        @(posedge vif.clk);
-        
         vif.axi_arready     = 1'b1;
-
+        
+        @(posedge vif.clk);        
+    
         while (!vif.axi_arvalid) @(posedge vif.clk);
         
         @(posedge vif.clk);
@@ -331,4 +335,3 @@ class axi_driver extends uvm_driver#(axi_transaction);
     endtask : read_data_m
     
 endclass : axi_driver
-
