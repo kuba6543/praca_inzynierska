@@ -4,6 +4,7 @@ class axi_monitor extends uvm_monitor;
     virtual axi_if vif;
     uvm_analysis_port #(axi_transaction) axi_analysis_port;
     axi_transaction trans_collected;
+    axi_sequence bresp_seq;
 
     // UVM automation macros for general components
     `uvm_component_utils(axi_monitor)
@@ -28,6 +29,7 @@ class axi_monitor extends uvm_monitor;
             @(posedge vif.clk);
             if (vif.axi_awvalid && vif.axi_awready && !vif.rst) begin
                 trans_collected = axi_transaction::type_id::create("aw_trans");
+                trans_collected.trans_type_e = axi_transaction::AW;
                 trans_collected.axi_awid    = vif.axi_awid;
                 trans_collected.axi_awaddr  = vif.axi_awaddr;
                 trans_collected.axi_awlen   = vif.axi_awlen;
@@ -42,7 +44,8 @@ class axi_monitor extends uvm_monitor;
                 `uvm_info("MON", $sformatf("Sampled AW transaction:\n%s", trans_collected.sprint()), UVM_MEDIUM)                                
             end
             if (vif.axi_wvalid && vif.axi_wready && !vif.rst) begin
-                trans_collected = axi_transaction::type_id::create("w_trans");            
+                trans_collected = axi_transaction::type_id::create("w_trans");
+                trans_collected.trans_type_e = axi_transaction::W;            
                 trans_collected.axi_wdata   = vif.axi_wdata;
                 trans_collected.axi_wstrb   = vif.axi_wstrb;
                 trans_collected.axi_wuser   = vif.axi_wuser;
@@ -50,7 +53,8 @@ class axi_monitor extends uvm_monitor;
                 `uvm_info("MON", $sformatf("Sampled W transaction:\n%s", trans_collected.sprint()), UVM_MEDIUM)                                
             end
             if (vif.axi_bvalid && vif.axi_bready && !vif.rst) begin
-                trans_collected = axi_transaction::type_id::create("b_trans");            
+                trans_collected = axi_transaction::type_id::create("b_trans");
+                trans_collected.trans_type_e = axi_transaction::B;                        
                 trans_collected.axi_bid     = vif.axi_bid;
                 trans_collected.axi_bresp   = vif.axi_bresp;
                 trans_collected.axi_buser   = vif.axi_buser;
@@ -59,7 +63,8 @@ class axi_monitor extends uvm_monitor;
             end
             if (vif.axi_arvalid && vif.axi_arready && !vif.rst) begin
                 @(posedge vif.clk);
-                trans_collected = axi_transaction::type_id::create("ar_trans");                                                            
+                trans_collected = axi_transaction::type_id::create("ar_trans");
+                trans_collected.trans_type_e = axi_transaction::AR;                                                                            
                 trans_collected.axi_arid    = vif.axi_arid;
                 trans_collected.axi_araddr  = vif.axi_araddr;
                 trans_collected.axi_arlen   = vif.axi_arlen;
@@ -75,7 +80,8 @@ class axi_monitor extends uvm_monitor;
             end
             if (vif.axi_rvalid && vif.axi_rready && !vif.rst) begin
                 @(posedge vif.clk);            
-                trans_collected = axi_transaction::type_id::create("r_trans"); 
+                trans_collected = axi_transaction::type_id::create("r_trans");
+                trans_collected.trans_type_e = axi_transaction::R;                 
                 trans_collected.axi_rid     = vif.axi_rid;
                 trans_collected.axi_rdata   = vif.axi_rdata;
                 trans_collected.axi_rresp   = vif.axi_rresp;

@@ -2,19 +2,14 @@ class axi_coverage_collector extends uvm_component;
 
     `uvm_component_utils(axi_coverage_collector)
 
-    // Analysis implementation port
     uvm_analysis_imp#(axi_transaction, axi_coverage_collector) analysis_export;
 
-    // Transaction for sampling
     axi_transaction trans;
 
-    // Covergroup definition
-    covergroup axi_cov;  // optional: remove if not using clocking block
+    covergroup axi_cov;
 
-        // Coverpoint: Transaction type (custom enum)
-        coverpoint trans.transaction_type;
+        coverpoint trans.trans_type_e;
 
-        // Coverpoint: Write address properties
         coverpoint trans.axi_awaddr {
             bins low_addr     = {[32'h0000_0000 : 32'h0000_0FFF]};
             bins mid_addr     = {[32'h0000_1000 : 32'h000F_FFFF]};
@@ -41,7 +36,6 @@ class axi_coverage_collector extends uvm_component;
             illegal_bins reserved = {2'b11};
         }
 
-        // Coverpoint: Write data
         coverpoint trans.axi_wdata {
             bins all_zeros = {32'h0000_0000};
             bins all_ones  = {32'hFFFF_FFFF};
@@ -55,7 +49,6 @@ class axi_coverage_collector extends uvm_component;
             bins even = {4'b1010};
         }
 
-        // Coverpoint: Read address properties
         coverpoint trans.axi_araddr {
             bins low_addr     = {[32'h0000_0000 : 32'h0000_0FFF]};
             bins high_addr    = {[32'h0010_0000 : 32'hFFFF_FFFF]};
@@ -79,7 +72,6 @@ class axi_coverage_collector extends uvm_component;
             illegal_bins reserved = {2'b11};
         }
 
-        // Response coverage
         coverpoint trans.axi_bresp {
             bins okay     = {2'b00};
             bins exokay   = {2'b01};
@@ -94,12 +86,6 @@ class axi_coverage_collector extends uvm_component;
             bins decerr   = {2'b11};
         }
 
-        // Cross coverage
-//        cross trans.axi_awburst, trans.axi_awlen;
-//        cross trans.axi_arburst, trans.axi_arlen;
-//        cross trans.axi_awvalid, trans.axi_awready;
-//        cross trans.axi_arvalid, trans.axi_arready;
-
     endgroup : axi_cov
 
     function new(string name = "axi_coverage_collector", uvm_component parent);
@@ -108,7 +94,6 @@ class axi_coverage_collector extends uvm_component;
         axi_cov = new();
     endfunction
 
-    // Write from monitor
     function void write(axi_transaction t);
         trans = t;
         axi_cov.sample();

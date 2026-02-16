@@ -10,7 +10,3 @@
 `include "axi_env.sv"
 `include "axi_test.sv"
 `include "../axi_if.sv"
-
-typedef enum {
-    W = 0,
-    R  = 1} transaction_type_t;
